@@ -1,0 +1,2470 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Central de Telas — Sinalização Digital para TVs</title>
+<style>
+/* Skip artifact shell — fixed styles served beside every artifact.
+   Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
+   override --accent for their own identity. */
+:root {
+  color-scheme: light dark;
+  --accent: #2563eb;
+  --accent-contrast: #ffffff;
+  --accent-text: color-mix(in srgb, var(--accent) 72%, #000);
+  --bg: #f8f9fb;
+  --surface: #ffffff;
+  --text: #14171f;
+  --text-muted: #5b6472;
+  --border: rgba(20, 23, 31, 0.10);
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(20, 23, 31, 0.08);
+  --space: 16px;
+  --success: #0a7a35;
+  --danger: #c0262d;
+  --warning: #8a5300;
+}
+/* Theme resolution. Without data-theme the viewer's system preference decides,
+   as it always did. With it, the artifact's own choice wins in BOTH directions:
+   a page that hardcodes one palette must not be handed the opposite set of
+   tokens by the machine it happens to be opened on. The dark values appear
+   twice because a media query cannot be folded into a selector list.
+   The attribute sits inside :where() so these blocks keep the specificity of a
+   bare :root — the page's own <style> is linked after this file and must go on
+   overriding any token it wants, exactly as it could before. */
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme="light"])) {
+    --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+    --bg: #101318;
+    --surface: #181c23;
+    --text: #eef1f6;
+    --text-muted: #9aa4b2;
+    --border: rgba(238, 241, 246, 0.12);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    --success: #4ade80;
+    --danger: #f87171;
+    --warning: #fbbf24;
+  }
+}
+:root:where([data-theme="dark"]) {
+  color-scheme: dark;
+  --accent-text: color-mix(in srgb, var(--accent) 78%, #fff);
+  --bg: #101318;
+  --surface: #181c23;
+  --text: #eef1f6;
+  --text-muted: #9aa4b2;
+  --border: rgba(238, 241, 246, 0.12);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  --success: #4ade80;
+  --danger: #f87171;
+  --warning: #fbbf24;
+}
+:root:where([data-theme="light"]) { color-scheme: light; }
+/* Pages generated before the shell had its own components still link the
+   basecoat CDN, which reads its own tokens and switches theme only on a
+   .dark class. Bridged to the shell's, whatever of it those pages use takes
+   the page's accent and follows the declared theme. Its --accent token is a
+   hover tint, renamed in its theme as --color-accent; the shell's --accent is
+   the brand colour, so the tint is derived from it here. */
+:root {
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--surface);
+  --card-foreground: var(--text);
+  --popover: var(--surface);
+  --popover-foreground: var(--text);
+  --primary: var(--accent);
+  --primary-foreground: var(--accent-contrast);
+  --secondary: color-mix(in srgb, var(--text) 7%, var(--surface));
+  --secondary-foreground: var(--text);
+  --muted: color-mix(in srgb, var(--text) 5%, var(--surface));
+  --muted-foreground: var(--text-muted);
+  --color-accent: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --color-accent-foreground: var(--text);
+  --destructive: var(--danger);
+  --input: var(--border);
+  --ring: var(--accent);
+}
+* { box-sizing: border-box; }
+/* The reset the pages were written against: they all linked basecoat, which
+   ships Tailwind's. Its components now live here, so the reset does too. */
+*, ::before, ::after, ::backdrop { margin: 0; padding: 0; border: 0 solid; }
+/* Preflight's rule too: without it a component class that sets display
+   (.alert, .card, .btn…) beats the hidden attribute and shows the element. */
+[hidden]:where(:not([hidden="until-found"])) { display: none !important; }
+.hidden { display: none !important; }
+h1, h2, h3, h4, h5, h6 { font-size: inherit; font-weight: inherit; }
+a { color: inherit; text-decoration: inherit; }
+b, strong { font-weight: bolder; }
+ol, ul, menu { list-style: none; }
+svg, video, canvas, iframe { display: block; vertical-align: middle; }
+button, input, select, textarea { color: inherit; background-color: transparent; border-radius: 0; }
+table { border-collapse: collapse; }
+hr { height: 0; color: inherit; border-top-width: 1px; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+img { max-width: 100%; display: block; }
+
+.shell-container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.shell-section { padding: calc(var(--space) * 2) 0; }
+.shell-grid { display: grid; gap: var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.shell-toolbar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: var(--space); }
+.shell-footer { padding: 24px 0 40px; color: var(--text-muted); font-size: 13px; }
+
+.shell-hero { padding: calc(var(--space) * 3) 0 calc(var(--space) * 2); }
+.shell-hero h1 { font-size: clamp(26px, 4vw, 40px); line-height: 1.15; margin: 0 0 10px; text-wrap: balance; }
+.shell-hero p { color: var(--text-muted); max-width: 60ch; margin: 0; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space);
+}
+
+.kpi { display: flex; flex-direction: column; gap: 4px; }
+.kpi .kpi-value { font-size: clamp(22px, 2.3vw, 28px); font-weight: 650; line-height: 1.1; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.kpi .kpi-label { font-size: 13px; color: var(--text-muted); }
+.kpi .kpi-delta { font-size: 12.5px; font-weight: 600; }
+.kpi .kpi-delta.up { color: var(--success); }
+.kpi .kpi-delta.down { color: var(--danger); }
+
+table.shell-table { border-collapse: collapse; width: 100%; font-size: 14px; }
+table.shell-table th {
+  text-align: left; font-size: 11.5px; letter-spacing: 0.05em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 600;
+}
+table.shell-table th, table.shell-table td { padding: 9px 12px 9px 0; border-bottom: 1px solid var(--border); }
+table.shell-table td.num, table.shell-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+table.shell-table tbody tr:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+
+.chart-box { width: 100%; min-height: 220px; }
+.chart-box svg { width: 100%; height: auto; display: block; }
+.chart-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 16px; margin-top: 12px; font-size: 12.5px; color: var(--text-muted); }
+.chart-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.chart-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.chart-legend b { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+.muted { color: var(--text-muted); }
+.accent { color: var(--accent-text); }
+.shell-badge, .eyebrow {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 12%, transparent); color: var(--accent-text);
+}
+/* A pill keeps its content width inside flex and grid columns, which would
+   otherwise stretch it across the card; a centred parent still centres it. */
+.shell-badge, .eyebrow, .badge { width: fit-content; max-width: 100%; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shell-fade { animation: shell-fade 400ms ease both; }
+  @keyframes shell-fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+
+/* Layout and type utilities: what the pages kept spelling in style="".
+   Spacing and type sizes follow Tailwind's scale; there is no Tailwind. */
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.stack { display: flex; flex-direction: column; gap: var(--space); }
+.between { justify-content: space-between; }
+.grow { flex: 1 1 0; min-width: 0; }
+.cols-2, .cols-3, .cols-4, .cols-5 { display: grid; gap: var(--space); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 720px) {
+  .cols-2, .cols-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cols-5 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1000px) { .cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 1100px) { .cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.gap-1 { gap: 4px; } .gap-2 { gap: 8px; } .gap-3 { gap: 12px; } .gap-4 { gap: 16px; } .gap-6 { gap: 24px; }
+.m-0 { margin: 0; }
+.mt-1 { margin-top: 4px; } .mt-2 { margin-top: 8px; } .mt-3 { margin-top: 12px; } .mt-4 { margin-top: 16px; } .mt-6 { margin-top: 24px; }
+.mb-1 { margin-bottom: 4px; } .mb-2 { margin-bottom: 8px; } .mb-3 { margin-bottom: 12px; } .mb-4 { margin-bottom: 16px; } .mb-6 { margin-bottom: 24px; }
+.p-2 { padding: 8px; } .p-3 { padding: 12px; } .p-4 { padding: 16px; } .p-6 { padding: 24px; }
+.text-xs { font-size: 12px; } .text-sm { font-size: 14px; } .text-base { font-size: 16px; }
+.text-lg { font-size: 18px; } .text-xl { font-size: 20px; line-height: 1.35; }
+.text-2xl { font-size: 24px; line-height: 1.25; } .text-3xl { font-size: 30px; line-height: 1.2; }
+.font-medium { font-weight: 500; } .font-semibold { font-weight: 600; } .font-bold { font-weight: 700; }
+.text-right { text-align: right; } .text-center { text-align: center; }
+.nowrap { white-space: nowrap; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-variant-numeric: tabular-nums; }
+.w-full { width: 100%; }
+.text-success { color: var(--success); } .text-danger { color: var(--danger); } .text-warning { color: var(--warning); }
+
+/* Components, with basecoat 1.0 markup (variants and sizes are data
+   attributes) and the shell tokens, so a page needs neither component CSS
+   nor a CSS framework. An older page that also links basecoat gets these
+   rules after it, over the same properties. */
+button, input, select, textarea { font: inherit; }
+input[type="checkbox"], input[type="radio"] { accent-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  height: 36px; padding: 0 14px; border: 1px solid transparent; border-radius: calc(var(--radius) - 2px);
+  background: var(--accent); color: var(--accent-contrast);
+  font-size: 14px; font-weight: 500; line-height: 1; white-space: nowrap; text-decoration: none; cursor: pointer;
+  transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+}
+.btn:hover { background: color-mix(in srgb, var(--accent) 86%, #000); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.5; pointer-events: none; }
+.btn[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.btn[data-variant="secondary"]:hover { background: color-mix(in srgb, var(--text) 14%, var(--surface)); }
+.btn[data-variant="outline"] { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn[data-variant="ghost"] { background: transparent; color: var(--text); }
+.btn[data-variant="outline"]:hover, .btn[data-variant="ghost"]:hover { background: color-mix(in srgb, var(--accent) 10%, var(--surface)); }
+.btn[data-variant="destructive"] { background: var(--danger); color: var(--bg); }
+.btn[data-variant="destructive"]:hover { background: color-mix(in srgb, var(--danger) 86%, var(--text)); }
+.btn[data-variant="link"] { height: auto; padding: 0; background: none; color: var(--accent-text); text-decoration: underline; text-underline-offset: 3px; }
+.btn[data-size="sm"] { height: 30px; padding: 0 10px; font-size: 13px; }
+.btn[data-size="lg"] { height: 42px; padding: 0 20px; font-size: 15px; }
+.btn[data-size="icon"] { width: 36px; padding: 0; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px;
+  border: 1px solid transparent; border-radius: 999px; background: var(--accent); color: var(--accent-contrast);
+  font-size: 12px; font-weight: 600; line-height: 1.5; white-space: nowrap;
+}
+.badge[data-variant="secondary"] { background: color-mix(in srgb, var(--text) 8%, var(--surface)); color: var(--text); }
+.badge[data-variant="outline"] { background: transparent; color: var(--text); border-color: var(--border); }
+.badge[data-variant="destructive"] { background: color-mix(in srgb, var(--danger) 14%, var(--surface)); color: var(--danger); }
+
+.alert {
+  display: grid; gap: 4px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+.alert h2, .alert h3 { margin: 0; font-size: 14px; font-weight: 600; }
+.alert p, .alert section { margin: 0; color: var(--text-muted); }
+.alert[data-variant="destructive"] { border-color: color-mix(in srgb, var(--danger) 45%, var(--border)); background: color-mix(in srgb, var(--danger) 7%, var(--surface)); color: var(--danger); }
+
+.card {
+  display: flex; flex-direction: column; gap: 16px; padding: 20px 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 2px);
+  background: var(--surface); color: var(--text); box-shadow: var(--shadow);
+}
+.card > header, .card > section, .card > footer { padding: 0 20px; }
+.card > header { display: grid; gap: 4px; }
+.card > header h2, .card > header h3 { margin: 0; font-size: 16px; font-weight: 600; line-height: 1.3; }
+.card > header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+.card > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+
+.input {
+  width: 100%; min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); border-radius: calc(var(--radius) - 2px);
+  background: var(--surface); color: var(--text); font-size: 14px;
+}
+textarea.input { min-height: 84px; resize: vertical; }
+.input::placeholder { color: var(--text-muted); }
+.input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 14px; font-weight: 500; }
+.field [role="alert"] { color: var(--danger); font-size: 13px; }
+
+dialog.dialog {
+  width: min(520px, calc(100vw - 32px)); max-height: calc(100vh - 32px); margin: auto; padding: 0;
+  border: 1px solid var(--border); border-radius: calc(var(--radius) + 4px);
+  background: var(--surface); color: var(--text); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+dialog.dialog::backdrop { background: rgba(0, 0, 0, 0.5); }
+dialog.dialog > div { display: grid; gap: 16px; padding: 24px; }
+dialog.dialog header { display: grid; gap: 4px; }
+dialog.dialog header h2 { margin: 0; font-size: 18px; font-weight: 600; }
+dialog.dialog header p { margin: 0; color: var(--text-muted); font-size: 14px; }
+dialog.dialog footer { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+.tabs { display: grid; gap: 12px; }
+.tabs > [role="tablist"] {
+  display: inline-flex; gap: 4px; width: fit-content; max-width: 100%; padding: 4px; overflow-x: auto;
+  border-radius: var(--radius); background: color-mix(in srgb, var(--text) 6%, var(--surface));
+}
+.tabs [role="tab"] {
+  padding: 6px 12px; border: 0; border-radius: calc(var(--radius) - 4px); background: transparent;
+  color: var(--text-muted); font-size: 14px; font-weight: 500; white-space: nowrap; cursor: pointer;
+}
+.tabs [role="tab"][aria-selected="true"] { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+.tabs [role="tabpanel"][hidden] { display: none; }
+
+.accordion > details { border-bottom: 1px solid var(--border); }
+.accordion > details > summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 0; font-weight: 500; list-style: none; cursor: pointer;
+}
+.accordion > details > summary::-webkit-details-marker { display: none; }
+.accordion > details > summary::after { content: "+"; color: var(--text-muted); font-size: 18px; line-height: 1; }
+.accordion > details[open] > summary::after { content: "\2212"; }
+.accordion > details > :not(summary) { margin: 0 0 14px; color: var(--text-muted); }
+
+.toaster {
+  position: fixed; right: 16px; bottom: 16px; z-index: 50; display: flex; flex-direction: column-reverse; gap: 8px;
+  width: min(360px, calc(100vw - 32px)); pointer-events: none;
+}
+.toaster .toast { pointer-events: auto; transition: opacity 200ms ease, transform 200ms ease; }
+.toaster .toast[aria-hidden="true"] { opacity: 0; transform: translateY(8px); }
+.toaster .toast-content {
+  padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); font-size: 13px;
+}
+.toaster .toast-content h2 { margin: 0 0 2px; font-size: 14px; font-weight: 600; }
+.toaster .toast-content p { margin: 0; color: var(--text-muted); }
+
+/* skipUI building blocks. */
+.skip-table-search { max-width: 320px; margin-bottom: 12px; }
+.skip-table-wrap { overflow-x: auto; }
+table.shell-table th[data-sort] { cursor: pointer; user-select: none; }
+table.shell-table th[aria-sort="ascending"]::after { content: " \25B2"; font-size: 9px; }
+table.shell-table th[aria-sort="descending"]::after { content: " \25BC"; font-size: 9px; }
+table.shell-table td.skip-table-empty { color: var(--text-muted); text-align: center; padding: 24px 0; }
+.skip-pager { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 12px; font-size: 13px; color: var(--text-muted); }
+.toaster .toast[data-type="success"] .toast-content { border-left: 3px solid var(--success); }
+.toaster .toast[data-type="error"] .toast-content { border-left: 3px solid var(--danger); }
+
+</style>
+<script>
+/* Skip artifact shell — fixed helpers served beside every artifact. */
+(function () {
+  "use strict";
+
+  var fmt = {
+    num: function (v, opts) { return new Intl.NumberFormat("pt-BR", opts || {}).format(v); },
+    brl: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(v); },
+    pct: function (v) { return new Intl.NumberFormat("pt-BR", { style: "percent", maximumFractionDigits: 1 }).format(v); },
+    compact: function (v) { return new Intl.NumberFormat("pt-BR", { notation: "compact", maximumFractionDigits: 1 }).format(v); },
+    brlCompact: function (v) { return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: 1 }).format(v); }
+  };
+
+  // axisLabels formats the five y-axis ticks in the unit the chart declared
+  // (percent, BRL or plain numbers), compact so long values never clip, with
+  // the fewest decimals that still print every tick exactly (1,5 mi, not 2 mi).
+  function axisLabels(format, ticks) {
+    function at(digits) {
+      var opts = { notation: "compact", maximumFractionDigits: digits };
+      if (format === "pct") opts = { style: "percent", maximumFractionDigits: digits };
+      else if (format === "brl") opts = { style: "currency", currency: "BRL", notation: "compact", maximumFractionDigits: digits };
+      var nf = new Intl.NumberFormat("pt-BR", opts);
+      return ticks.map(function (t) { return nf.format(t); });
+    }
+    for (var digits = 0; digits < 2; digits++) {
+      if (at(digits).join("|") === at(digits + 1).join("|")) return at(digits);
+    }
+    return at(2);
+  }
+
+  // yAxisPad formats the ticks and measures the left padding they need from
+  // the longest one; drawYAxis then draws the grid and the labels.
+  function yAxisPad(format, max) {
+    var labels = axisLabels(format, [0, max / 4, max / 2, (max * 3) / 4, max]);
+    var longest = labels.reduce(function (m, l) { return Math.max(m, l.length); }, 0);
+    return { labels: labels, padL: Math.max(40, Math.round(longest * 6.2) + 14) };
+  }
+  function drawYAxis(svg, axis, W, padR, padT, plotH) {
+    for (var g = 0; g <= 4; g++) {
+      var gy = padT + plotH - (plotH * g) / 4;
+      svg.appendChild(svgEl("line", { x1: axis.padL, y1: gy, x2: W - padR, y2: gy, stroke: "currentColor", "stroke-opacity": 0.08 }));
+      var lbl = svgEl("text", { x: axis.padL - 8, y: gy + 4, "text-anchor": "end", "font-size": 10, fill: mutedColor() });
+      lbl.textContent = axis.labels[g];
+      svg.appendChild(lbl);
+    }
+  }
+
+  // xLabelStep: show every k-th category label so labels never overlap, and
+  // always the last one (counted back from the end).
+  function xLabelStep(labels, step) {
+    var longest = labels.reduce(function (m, l) { return Math.max(m, String(l).length); }, 0);
+    return Math.max(1, Math.ceil((longest * 6.4 + 8) / Math.max(step, 1)));
+  }
+  function drawXLabel(svg, text, x, y, W, edgeGuard) {
+    var anchor = "middle";
+    var half = String(text).length * 3.2;
+    if (edgeGuard && x - half < 4) anchor = "start";
+    if (edgeGuard && x + half > W - 4) anchor = "end";
+    var tx = svgEl("text", { x: x, y: y, "text-anchor": anchor, "font-size": 11, fill: mutedColor() });
+    tx.textContent = text;
+    svg.appendChild(tx);
+  }
+  // categoryLines fits a bar's category name in its slot: one line, two lines
+  // split at a space, or cut with "…". A bar without its name can't be read, so
+  // categories are never skipped; null when the slot is too narrow for that.
+  function categoryLines(text, slot) {
+    var fit = Math.floor((slot - 6) / 6.4);
+    var s = String(text);
+    if (fit < 4) return null;
+    if (s.length <= fit) return [s];
+    var cut = function (t) { return t.length <= fit ? t : t.slice(0, fit - 1).trimEnd() + "…"; };
+    var best = -1;
+    for (var i = 0; i < s.length; i++) {
+      if (s[i] === " " && (best < 0 || Math.abs(s.length / 2 - i) < Math.abs(s.length / 2 - best))) best = i;
+    }
+    if (best < 0) return [cut(s)];
+    return [cut(s.slice(0, best)), cut(s.slice(best + 1))];
+  }
+  function legend(el, items) {
+    var box = document.createElement("div");
+    box.className = "chart-legend";
+    items.forEach(function (it) {
+      var row = document.createElement("span");
+      var dot = document.createElement("i");
+      dot.style.background = it.color;
+      row.appendChild(dot);
+      row.appendChild(document.createTextNode((it.label || "") + (it.value ? " " : "")));
+      if (it.value) {
+        var v = document.createElement("b");
+        v.textContent = it.value;
+        row.appendChild(v);
+      }
+      box.appendChild(row);
+    });
+    resolve(el).appendChild(box);
+  }
+  var seriesPalette = ["#1baf7a", "#eda100", "#e34948", "#4a3aa7", "#e87ba4", "#0ea5b7"];
+
+  // format accepts a function OR one of the fmt names ("num" | "brl" | "pct").
+  // A page's function may return nothing or throw: the chart prints its
+  // number instead of taking the rest of the page script down with it.
+  function coerceFormat(spec) {
+    if (typeof spec === "function") {
+      return function (v) {
+        try {
+          var out = spec(v);
+          return out == null ? "" : String(out);
+        } catch (e) {
+          return fmt.num(v);
+        }
+      };
+    }
+    if (typeof spec === "string" && fmt[spec]) return fmt[spec];
+    return function (v) { return fmt.num(v); };
+  }
+
+  function accent() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--accent").trim() || "#2563eb";
+  }
+  function mutedColor() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--text-muted").trim() || "#5b6472";
+  }
+  function svgEl(tag, attrs) {
+    var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+    for (var k in attrs) el.setAttribute(k, attrs[k]);
+    return el;
+  }
+  function frame(el, w, h) {
+    var svg = svgEl("svg", { viewBox: "0 0 " + w + " " + h, role: "img" });
+    el = resolve(el);
+    el.innerHTML = "";
+    el.appendChild(svg);
+    return svg;
+  }
+
+  // maxOf guards the axis scale: empty values would give -Infinity (truthy,
+  // so "|| 1" can't catch it) and a non-positive max would flip the chart.
+  // finite reads a chart value as a number, 0 when it is not one (NaN,
+  // Infinity, a stray string), so one bad value cannot blank the axis.
+  function finite(v) {
+    var n = +v;
+    return isFinite(n) ? n : 0;
+  }
+
+  function maxOf(values) {
+    var m = values.length ? Math.max.apply(null, values.map(finite)) : 0;
+    return m > 0 ? m : 1;
+  }
+
+  // labelsFor pads or trims the category names to the n points drawn: pages
+  // pass labels and values of different lengths, and one throw here loses
+  // every section the page renders after the chart.
+  function labelsFor(cfg, n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(cfg.labels && cfg.labels[i] != null ? String(cfg.labels[i]) : "");
+    return out;
+  }
+
+  // niceMax rounds the scale up so the four grid steps land on round values
+  // (1, 1.5, 2, 2.5, 3, 4, 5, 6 or 8 × 10^k) and the tick labels read exactly.
+  function niceMax(max) {
+    var raw = max / 4;
+    var mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    var res = raw / mag;
+    var steps = [1, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10];
+    var nice = steps.filter(function (s) { return s >= res - 1e-9; })[0];
+    return nice * mag * 4;
+  }
+
+  // bar(el, {labels:[], values:[], color?, format?}) — vertical bar chart.
+  function bar(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 12;
+    var max = niceMax(maxOf(cfg.values));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = cfg.values.length;
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR;
+    var step = plotW / n, bw = Math.min(step * 0.62, 64);
+    var names = labels.map(function (l) { return categoryLines(l, step); });
+    var named = names.every(Boolean);
+    if (named && names.some(function (l) { return l.length > 1; })) padB = 42;
+    var plotH = H - padT - padB;
+    var color = cfg.color || accent();
+    var f = coerceFormat(cfg.format);
+    var every = xLabelStep(labels, step);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    cfg.values.forEach(function (v, i) {
+      var bh = Math.max(0, (finite(v) / max) * plotH);
+      var x = axis.padL + i * step + (step - bw) / 2;
+      var y = padT + plotH - bh;
+      var r = svgEl("rect", { x: x, y: y, width: bw, height: bh, rx: 4, fill: (cfg.colors && cfg.colors[i]) || color });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + f(v);
+      r.appendChild(t);
+      svg.appendChild(r);
+      if (named) {
+        names[i].forEach(function (text, li) {
+          drawXLabel(svg, text, x + bw / 2, padT + plotH + 18 + li * 13, W, false);
+        });
+      } else if ((n - 1 - i) % every === 0) {
+        drawXLabel(svg, labels[i], x + bw / 2, H - 10, W, false);
+      }
+    });
+  }
+
+  // line(el, {labels:[], values:[] | series:[{label, values, color?}], color?, format?})
+  // — one line, or several series on one scale with a legend under the chart.
+  function line(el, cfg) {
+    var W = 640, H = 280, padB = 30, padT = 12, padR = 16;
+    var series = cfg.series && cfg.series.length
+      ? cfg.series
+      : [{ label: "", values: cfg.values || [], color: cfg.color }];
+    var all = [];
+    series.forEach(function (s) { all = all.concat(s.values || []); });
+    var max = niceMax(maxOf(all));
+    var axis = yAxisPad(cfg.format, max);
+    var svg = frame(el, W, H);
+    var n = series.reduce(function (m, s) { return Math.max(m, (s.values || []).length); }, 0);
+    var labels = labelsFor(cfg, n);
+    var plotW = W - axis.padL - padR, plotH = H - padT - padB;
+    var f = coerceFormat(cfg.format);
+    drawYAxis(svg, axis, W, padR, padT, plotH);
+    var xs = labels.map(function (_, i) { return axis.padL + (n === 1 ? plotW / 2 : (plotW * i) / (n - 1)); });
+    var every = xLabelStep(labels, n > 1 ? plotW / (n - 1) : plotW);
+    labels.forEach(function (label, i) {
+      if ((n - 1 - i) % every === 0) drawXLabel(svg, label, xs[i], H - 10, W, true);
+    });
+    var colors = series.map(function (s, si) {
+      return s.color || (si === 0 ? (cfg.color || accent()) : seriesPalette[(si - 1) % seriesPalette.length]);
+    });
+    series.forEach(function (s, si) {
+      var color = colors[si];
+      var pts = (s.values || []).map(function (v, i) { return [xs[i], padT + plotH - (finite(v) / max) * plotH]; });
+      var d = pts.map(function (p, i) { return (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); }).join(" ");
+      svg.appendChild(svgEl("path", { d: d, fill: "none", stroke: color, "stroke-width": 2, "stroke-linejoin": "round" }));
+      pts.forEach(function (p, i) {
+        var c = svgEl("circle", { cx: p[0], cy: p[1], r: 3.5, fill: color });
+        var t = svgEl("title", {});
+        t.textContent = (s.label ? s.label + " · " : "") + labels[i] + ": " + f(s.values[i]);
+        c.appendChild(t);
+        svg.appendChild(c);
+      });
+    });
+    if (series.length > 1) {
+      legend(el, series.map(function (s, si) { return { label: s.label, color: colors[si] }; }));
+    }
+  }
+
+  // donut(el, {labels:[], values:[], colors?, format?, center?, centerLabel?, legend?})
+  // — donut with a short total in the centre (compact, in the declared unit)
+  // and, with legend: true, the labels and shares listed under it.
+  function donut(el, cfg) {
+    var W = 320, H = 280, cx = W / 2, cy = H / 2, R = 92, r = 58;
+    var svg = frame(el, W, H);
+    // At 100% of a wide container the donut outgrows the height pages give
+    // the box and spills over the next section: keep it at its own size.
+    svg.style.maxWidth = W + "px";
+    svg.style.margin = "0 auto";
+    var values = cfg.values.map(finite);
+    var labels = labelsFor(cfg, values.length);
+    var sum = values.reduce(function (a, b) { return a + b; }, 0);
+    var total = sum || 1;
+    var palette = cfg.colors || [accent()].concat(seriesPalette);
+    // The hover keeps the full value; the centre has room for a short one.
+    var full = coerceFormat(cfg.format);
+    var short = typeof cfg.format === "function" ? full : cfg.format === "brl" ? fmt.brlCompact : fmt.compact;
+    var a0 = -Math.PI / 2;
+    values.forEach(function (v, i) {
+      var a1 = a0 + (v / total) * Math.PI * 2;
+      var large = a1 - a0 > Math.PI ? 1 : 0;
+      var p = ["M", cx + R * Math.cos(a0), cy + R * Math.sin(a0),
+        "A", R, R, 0, large, 1, cx + R * Math.cos(a1), cy + R * Math.sin(a1),
+        "L", cx + r * Math.cos(a1), cy + r * Math.sin(a1),
+        "A", r, r, 0, large, 0, cx + r * Math.cos(a0), cy + r * Math.sin(a0), "Z"].join(" ");
+      var path = svgEl("path", { d: p, fill: palette[i % palette.length] });
+      var t = svgEl("title", {});
+      t.textContent = labels[i] + ": " + full(v) + " (" + fmt.pct(v / total) + ")";
+      path.appendChild(t);
+      svg.appendChild(path);
+      a0 = a1;
+    });
+    // A share chart has no total worth printing: without its own centre text
+    // the caption alone takes the middle.
+    var text = cfg.center != null ? String(cfg.center) : (cfg.format === "pct" ? "" : short(sum));
+    if (text) {
+      var size = text.length > 9 ? 14 : text.length > 7 ? 17 : 20;
+      var center = svgEl("text", { x: cx, y: cfg.centerLabel ? cy + 1 : cy + 6, "text-anchor": "middle", "font-size": size, "font-weight": 650, fill: "currentColor" });
+      center.textContent = text;
+      svg.appendChild(center);
+    }
+    if (cfg.centerLabel) {
+      var cap = svgEl("text", { x: cx, y: text ? cy + 19 : cy + 5, "text-anchor": "middle", "font-size": 11, fill: mutedColor() });
+      cap.textContent = cfg.centerLabel;
+      svg.appendChild(cap);
+    }
+    if (cfg.legend) {
+      legend(el, labels.map(function (label, i) {
+        return { label: label, color: palette[i % palette.length], value: fmt.pct(values[i] / total) };
+      }));
+    }
+  }
+
+  // ---- Page building blocks: what dashboards and small systems kept
+  // re-implementing — a searchable sortable table, a KPI row, tabs, toasts,
+  // dialogs, saved state and mock data. Every call is opt-in, so a page that
+  // brings its own versions keeps them.
+
+  function resolve(target) {
+    return typeof target === "string" ? document.querySelector(target) : target;
+  }
+
+  function node(tag, className, text) {
+    var el = document.createElement(tag);
+    if (className) el.className = className;
+    if (text != null) el.textContent = text;
+    return el;
+  }
+
+  function isNumberColumn(col) {
+    return col.align === "right" || col.format === "num" || col.format === "brl" || col.format === "pct";
+  }
+
+  function cellText(col, row) {
+    var value = row[col.key];
+    if (value == null) return "";
+    return col.format ? coerceFormat(col.format)(value) : String(value);
+  }
+
+  function compareValues(a, b) {
+    if (typeof a === "number" && typeof b === "number") return a - b;
+    return String(a == null ? "" : a).localeCompare(String(b == null ? "" : b), "pt-BR", { numeric: true });
+  }
+
+  // table(el, {columns, rows, search?, pageSize?, empty?, onRowClick?}) — a
+  // table.shell-table with sortable headers, an optional search box and
+  // pager. A column is {key, label, format?, align?, sortable? (true),
+  // render?(value, row) returning a Node or an HTML string — the page writes
+  // its cell templates as markup}. Plain values are always set as text.
+  // Returns {setRows, rows}.
+  function table(target, cfg) {
+    var root = resolve(target);
+    var cols = cfg.columns || [];
+    var pageSize = cfg.pageSize || 0;
+    var state = { rows: (cfg.rows || []).slice(), query: "", key: null, dir: 1, page: 0 };
+    root.innerHTML = "";
+    if (cfg.search) {
+      var search = node("input", "input skip-table-search");
+      search.type = "search";
+      search.placeholder = typeof cfg.search === "string" ? cfg.search : "Buscar…";
+      search.setAttribute("aria-label", search.placeholder);
+      search.addEventListener("input", function () {
+        state.query = search.value.trim().toLowerCase();
+        state.page = 0;
+        draw();
+      });
+      root.appendChild(search);
+    }
+    var tableEl = node("table", "shell-table");
+    var headRow = node("tr");
+    var heads = cols.map(function (col) {
+      var th = node("th", isNumberColumn(col) ? "num" : "", col.label == null ? col.key : col.label);
+      th.scope = "col";
+      if (col.sortable !== false) {
+        var toggle = function () {
+          state.dir = state.key === col.key ? -state.dir : 1;
+          state.key = col.key;
+          draw();
+        };
+        th.setAttribute("data-sort", col.key);
+        th.tabIndex = 0;
+        th.addEventListener("click", toggle);
+        th.addEventListener("keydown", function (e) {
+          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); }
+        });
+      }
+      headRow.appendChild(th);
+      return th;
+    });
+    var thead = node("thead");
+    var tbody = node("tbody");
+    var wrap = node("div", "skip-table-wrap");
+    var pager = node("div", "skip-pager");
+    thead.appendChild(headRow);
+    tableEl.appendChild(thead);
+    tableEl.appendChild(tbody);
+    wrap.appendChild(tableEl);
+    root.appendChild(wrap);
+    if (pageSize) root.appendChild(pager);
+
+    function visibleRows() {
+      var rows = state.rows;
+      if (state.query) {
+        rows = rows.filter(function (row) {
+          return cols.some(function (col) { return cellText(col, row).toLowerCase().indexOf(state.query) >= 0; });
+        });
+      }
+      if (state.key) {
+        var key = state.key, dir = state.dir;
+        rows = rows.slice().sort(function (a, b) { return dir * compareValues(a[key], b[key]); });
+      }
+      return rows;
+    }
+
+    function drawRow(row) {
+      var tr = node("tr");
+      cols.forEach(function (col) {
+        var td = node("td", isNumberColumn(col) ? "num" : "");
+        if (!col.render) {
+          td.textContent = cellText(col, row);
+        } else {
+          var content = col.render(row[col.key], row);
+          if (content instanceof Node) td.appendChild(content);
+          else td.innerHTML = content == null ? "" : String(content);
+        }
+        tr.appendChild(td);
+      });
+      // The row stays a row (no role) and takes focus, so a keyboard reaches
+      // the same action; keys pressed on a control inside a cell are its own.
+      if (cfg.onRowClick) {
+        tr.style.cursor = "pointer";
+        tr.tabIndex = 0;
+        tr.addEventListener("click", function () { cfg.onRowClick(row); });
+        tr.addEventListener("keydown", function (e) {
+          if (e.target !== tr || (e.key !== "Enter" && e.key !== " ")) return;
+          e.preventDefault();
+          cfg.onRowClick(row);
+        });
+      }
+      return tr;
+    }
+
+    function pagerButton(label, disabled, step) {
+      var button = node("button", "btn", label);
+      button.type = "button";
+      button.setAttribute("data-variant", "outline");
+      button.setAttribute("data-size", "sm");
+      button.disabled = disabled;
+      button.addEventListener("click", function () { state.page += step; draw(); });
+      return button;
+    }
+
+    function draw() {
+      var rows = visibleRows();
+      heads.forEach(function (th, i) {
+        if (cols[i].key === state.key) th.setAttribute("aria-sort", state.dir > 0 ? "ascending" : "descending");
+        else th.removeAttribute("aria-sort");
+      });
+      var pages = pageSize ? Math.max(1, Math.ceil(rows.length / pageSize)) : 1;
+      state.page = Math.min(state.page, pages - 1);
+      var shown = pageSize ? rows.slice(state.page * pageSize, (state.page + 1) * pageSize) : rows;
+      tbody.innerHTML = "";
+      if (!shown.length) {
+        var empty = node("td", "skip-table-empty", cfg.empty || "Nenhum registro encontrado.");
+        empty.colSpan = cols.length;
+        tbody.appendChild(node("tr")).appendChild(empty);
+      }
+      shown.forEach(function (row) { tbody.appendChild(drawRow(row)); });
+      if (!pageSize) return;
+      pager.innerHTML = "";
+      var from = rows.length ? state.page * pageSize + 1 : 0;
+      pager.appendChild(node("span", "", from + "–" + Math.min(rows.length, (state.page + 1) * pageSize) + " de " + rows.length));
+      var nav = node("div", "row gap-2");
+      nav.appendChild(pagerButton("Anterior", state.page === 0, -1));
+      nav.appendChild(pagerButton("Próxima", state.page >= pages - 1, 1));
+      pager.appendChild(nav);
+    }
+
+    draw();
+    return {
+      setRows: function (rows) { state.rows = rows.slice(); draw(); },
+      rows: visibleRows
+    };
+  }
+
+  // kpis(el, [{label, value, format?, delta?, hint?}]) — KPI cards in a
+  // responsive grid; delta is a fraction (0.12 renders as ▲ 12%).
+  function kpis(target, items) {
+    var root = resolve(target);
+    root.innerHTML = "";
+    root.classList.add("shell-grid");
+    items.forEach(function (item) {
+      var card = node("div", "panel kpi");
+      card.appendChild(node("span", "kpi-label", item.label));
+      // Large money values go compact ("R$ 27,5 mi"): the full amount does
+      // not fit a KPI card at four per row.
+      var kpiFormat = item.format === "brl" && Math.abs(item.value) >= 1e6 ? fmt.brlCompact : (item.format ? coerceFormat(item.format) : null);
+      card.appendChild(node("span", "kpi-value", kpiFormat ? kpiFormat(item.value) : String(item.value)));
+      if (typeof item.delta === "number") {
+        var up = item.delta >= 0;
+        card.appendChild(node("span", "kpi-delta " + (up ? "up" : "down"), (up ? "▲ " : "▼ ") + fmt.pct(Math.abs(item.delta))));
+      }
+      if (item.hint) card.appendChild(node("span", "kpi-label", item.hint));
+      root.appendChild(card);
+    });
+  }
+
+  // badge(text, variant?) — a .badge node for table cells and lists;
+  // variant is "secondary" | "outline" | "destructive" (default: primary).
+  function badge(text, variant) {
+    var el = node("span", "badge", text);
+    if (variant) el.setAttribute("data-variant", variant);
+    return el;
+  }
+
+  // tabs(el) — wires one .tabs block: [role=tab] buttons inside
+  // [role=tablist], each with aria-controls naming its [role=tabpanel].
+  function tabs(target) {
+    var root = resolve(target);
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[role="tab"]'));
+    function select(chosen) {
+      buttons.forEach(function (b) {
+        var on = b === chosen;
+        b.setAttribute("aria-selected", on ? "true" : "false");
+        b.tabIndex = on ? 0 : -1;
+        var panel = document.getElementById(b.getAttribute("aria-controls"));
+        if (panel) panel.hidden = !on;
+      });
+    }
+    buttons.forEach(function (b, i) {
+      b.addEventListener("click", function () { select(b); });
+      b.addEventListener("keydown", function (e) {
+        var step = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+        if (!step) return;
+        var next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        select(next);
+      });
+    });
+    select(buttons.filter(function (b) { return b.getAttribute("aria-selected") === "true"; })[0] || buttons[0]);
+  }
+
+  // toast(message, {type?: "success" | "error", title?, duration?}) — a
+  // .toast in a shared .toaster at the bottom of the page.
+  function toast(message, opts) {
+    opts = opts || {};
+    var toaster = document.querySelector(".toaster") || document.body.appendChild(node("div", "toaster"));
+    var item = node("div", "toast");
+    item.setAttribute("role", opts.type === "error" ? "alert" : "status");
+    item.setAttribute("aria-hidden", "true");
+    if (opts.type) item.setAttribute("data-type", opts.type);
+    var content = node("div", "toast-content");
+    var section = node("section");
+    if (opts.title) section.appendChild(node("h2", "", opts.title));
+    section.appendChild(node("p", "", message));
+    content.appendChild(section);
+    item.appendChild(content);
+    toaster.appendChild(item);
+    requestAnimationFrame(function () { item.setAttribute("aria-hidden", "false"); });
+    setTimeout(function () {
+      item.setAttribute("aria-hidden", "true");
+      setTimeout(function () { item.remove(); }, 400);
+    }, opts.duration || 3000);
+  }
+
+  // Dialogs are native <dialog class="dialog">: a [data-dialog-open="id"]
+  // anywhere opens one, a [data-dialog-close] inside closes it, and a click on
+  // its backdrop closes it too. Plain dialog.showModal()/close() still work.
+  document.addEventListener("click", function (e) {
+    var target = e.target;
+    if (!(target instanceof Element)) return;
+    var opener = target.closest("[data-dialog-open]");
+    if (opener) {
+      var dialog = document.getElementById(opener.getAttribute("data-dialog-open"));
+      if (dialog && dialog.showModal && !dialog.open) dialog.showModal();
+      return;
+    }
+    var closer = target.closest("[data-dialog-close]");
+    if (closer && closer.closest("dialog")) {
+      closer.closest("dialog").close();
+      return;
+    }
+    if (target.tagName === "DIALOG" && target.classList.contains("dialog") && target.open) target.close();
+  });
+
+  // store(key, fallback) — JSON state in localStorage that never throws (a
+  // private window or a full quota falls back to memory): {get, set, update}.
+  function store(key, fallback) {
+    var memory;
+    // Set while the last write did not reach localStorage: what is stored
+    // there is older than memory until a write goes through again.
+    var unsaved = false;
+    var initial = function () { return fallback === undefined ? undefined : JSON.parse(JSON.stringify(fallback)); };
+    function get() {
+      if (!unsaved) {
+        try {
+          var raw = localStorage.getItem(key);
+          if (raw != null) return JSON.parse(raw);
+        } catch (e) { /* storage unavailable: memory below */ }
+      }
+      return memory !== undefined ? memory : initial();
+    }
+    function set(value) {
+      memory = value;
+      try {
+        localStorage.setItem(key, JSON.stringify(value));
+        unsaved = false;
+      } catch (e) {
+        unsaved = true;
+      }
+      return value;
+    }
+    return { get: get, set: set, update: function (fn) { return set(fn(get())); } };
+  }
+
+  // mock — seeded random data, so a page asks for 90 days of numbers in one
+  // line instead of writing them out; the same seed gives the same data.
+  var FIRST = ["Ana", "Bruno", "Carla", "Diego", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "João",
+    "Larissa", "Marcos", "Natália", "Otávio", "Paula", "Rafael", "Sofia", "Thiago", "Vanessa", "Lucas"];
+  var LAST = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima",
+    "Araújo", "Fernandes", "Carvalho", "Gomes", "Martins", "Rocha", "Ribeiro", "Barbosa"];
+  var INITIALS = "ABCDEFGHIJLMNOPRSTV".split("");
+  var CITIES = ["São Paulo, SP", "Rio de Janeiro, RJ", "Belo Horizonte, MG", "Curitiba, PR", "Porto Alegre, RS",
+    "Salvador, BA", "Recife, PE", "Fortaleza, CE", "Brasília, DF", "Goiânia, GO", "Campinas, SP", "Florianópolis, SC",
+    "Manaus, AM", "Belém, PA", "Vitória, ES", "Natal, RN"];
+
+  function createMock(seed) {
+    var state = seed >>> 0;
+    var names = 0;
+    function random() {
+      state = (state + 0x6d2b79f5) >>> 0;
+      var t = state;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    }
+    function int(min, max) { return min + Math.floor(random() * (max - min + 1)); }
+    function pick(list) { return list[Math.floor(random() * list.length)]; }
+    var mock = {
+      seed: function (value) { state = value >>> 0; names = 0; return mock; },
+      random: random,
+      int: int,
+      float: function (min, max, decimals) {
+        var factor = Math.pow(10, decimals == null ? 2 : decimals);
+        return Math.round((min + random() * (max - min)) * factor) / factor;
+      },
+      pick: pick,
+      chance: function (p) { return random() < p; },
+      // There are 360 first/last pairs. A page that draws until the name is
+      // new (do { … } while (used.has(name))) froze the tab past them, so
+      // later draws widen the space: a second surname after 200 (6,480), a
+      // middle initial after 4,000.
+      name: function () {
+        names++;
+        var middle = names > 4000 ? pick(INITIALS) + ". " : "";
+        return pick(FIRST) + " " + middle + (names > 200 ? pick(LAST) + " " : "") + pick(LAST);
+      },
+      city: function () { return pick(CITIES); },
+      // series(n, {start, trend, noise, min, decimals}) — a walk: each value
+      // moves by trend (fraction per step) plus up to ±noise of itself.
+      series: function (n, opts) {
+        opts = opts || {};
+        var value = opts.start == null ? 100 : opts.start;
+        var factor = Math.pow(10, opts.decimals || 0);
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          out.push(Math.max(opts.min == null ? 0 : opts.min, Math.round(value * factor) / factor));
+          value = value * (1 + (opts.trend || 0)) * (1 + (random() * 2 - 1) * (opts.noise == null ? 0.08 : opts.noise));
+        }
+        return out;
+      },
+      // dates(n, {end?, step?: "day" | "week" | "month"}) — ISO dates
+      // (YYYY-MM-DD), oldest first, ending at end (default: today).
+      dates: function (n, opts) {
+        opts = opts || {};
+        var end = opts.end ? new Date(opts.end) : new Date();
+        var out = [];
+        for (var i = n - 1; i >= 0; i--) {
+          var d = new Date(end.getTime());
+          if (opts.step === "month") d.setMonth(d.getMonth() - i);
+          else d.setDate(d.getDate() - i * (opts.step === "week" ? 7 : 1));
+          out.push(d.toISOString().slice(0, 10));
+        }
+        return out;
+      },
+      // rows(n, spec) — n objects; each spec value is a function(i), a list
+      // to pick from, or a constant.
+      rows: function (n, spec) {
+        var out = [];
+        for (var i = 0; i < n; i++) {
+          var row = {};
+          for (var key in spec) {
+            var value = spec[key];
+            row[key] = typeof value === "function" ? value(i) : Array.isArray(value) ? pick(value) : value;
+          }
+          out.push(row);
+        }
+        return out;
+      }
+    };
+    return mock;
+  }
+
+  window.skipShell = { fmt: fmt };
+  window.skipChart = { bar: bar, line: line, donut: donut };
+  window.skipUI = { table: table, kpis: kpis, badge: badge, tabs: tabs, toast: toast };
+  window.skipStore = store;
+  window.skipMock = createMock(20261022);
+})();
+
+</script>
+<style>
+:root {
+--accent: #d4a24c;
+--accent-text: #e8b96a;
+--accent-contrast: #14110a;
+}
+html, body { background: #0d0f14; color: #e7e9ee; font-family: system-ui, Inter, -apple-system, "Segoe UI", Roboto, sans-serif; margin: 0; }
+body { min-height: 100vh; display: flex; flex-direction: column; }
+h1, h2, h3 { color: #f3f4f7; }
+.app-header { position: sticky; top: 0; z-index: 30; background: rgba(13,15,20,0.94); backdrop-filter: blur(10px); border-bottom: 1px solid #262a35; }
+.tabs-pill { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { background: #161922; border: 1px solid #2c3140; color: #c9cdd8; padding: 8px 16px; border-radius: 999px; font-size: 14px; cursor: pointer; transition: all .18s ease; }
+.pill:hover { border-color: var(--accent); color: var(--accent-text); }
+.pill[aria-selected="true"] { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); font-weight: 600; }
+.card-dark { background: #161922; border: 1px solid #262a35; border-radius: 14px; padding: 18px; transition: border-color .2s, transform .2s; }
+.card-dark:hover { border-color: #3a4052; }
+.muted-dark { color: #9aa1b2; }
+.gold { color: var(--accent-text); }
+.lbl { display: block; font-size: 13px; color: #c3c8d4; margin-bottom: 6px; }
+.helper { font-size: 12px; color: #8b92a4; margin-top: 4px; }
+.inp { width: 100%; box-sizing: border-box; background: #0d0f14; border: 1px solid #343a4b; color: #eef0f5; border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+.inp:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.btn-gold { background: var(--accent); color: var(--accent-contrast); border: none; border-radius: 10px; padding: 10px 16px; font-weight: 600; cursor: pointer; font-size: 14px; transition: filter .15s, transform .15s; }
+.btn-gold:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-gold:focus-visible, .btn-ghost:focus-visible, .pill:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn-ghost { background: transparent; color: #d7dbe5; border: 1px solid #3a4052; border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer; transition: all .15s; }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-text); }
+.btn-danger { background: transparent; color: #f08a8a; border: 1px solid #5a2a2a; border-radius: 10px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+.btn-danger:hover { background: #2a1414; }
+.badge-link { background: rgba(96,165,250,.14); color: #93c5fd; border: 1px solid rgba(96,165,250,.35); }
+.badge-local { background: rgba(212,162,76,.14); color: var(--accent-text); border: 1px solid rgba(212,162,76,.4); }
+.badge-on { background: rgba(52,211,153,.14); color: #6ee7b7; border: 1px solid rgba(52,211,153,.35); }
+.badge-off { background: rgba(156,163,175,.12); color: #b4bac6; border: 1px solid rgba(156,163,175,.3); }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; }
+.eyebrow-pill { display: inline-block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent-text); background: rgba(212,162,76,.12); border: 1px solid rgba(212,162,76,.35); padding: 4px 12px; border-radius: 999px; }
+.kpi-big { font-size: 28px; font-weight: 700; color: var(--accent-text); }
+.grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.row-line { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: #0d0f14; border: 1px solid #262a35; border-radius: 10px; }
+.row-line .nm { flex: 1; font-size: 14px; }
+.icon-btn { background: #1d2130; border: 1px solid #343a4b; color: #d7dbe5; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+.icon-btn:hover { border-color: var(--accent); color: var(--accent-text); }
+.icon-btn:disabled { opacity: .35; cursor: default; }
+.live-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.7); animation: pulse 1.6s infinite; margin-right: 6px; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.7);} 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0);} 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0);} }
+.fade-in { animation: fadeIn .35s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none;} }
+.dlg { background: #161922; color: #eef0f5; border: 1px solid #343a4b; border-radius: 16px; padding: 0; width: min(720px, 94vw); }
+.dlg::backdrop { background: rgba(0,0,0,.7); }
+.dlg-inner { padding: 20px; }
+.footer-line { text-align: center; color: #6f7587; font-size: 12px; padding: 24px 12px; border-top: 1px solid #1f232e; margin-top: auto; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 20px 16px; width: 100%; box-sizing: border-box; }
+.section-title { font-size: 20px; margin: 0 0 4px; }
+.schedule-line { font-size: 14px; color: #d7dbe5; }
+pre.json-box { background:#0d0f14; border:1px solid #262a35; border-radius:10px; padding:12px; font-size:12px; max-height:220px; overflow:auto; color:#c9cdd8; white-space:pre-wrap; word-break:break-all; }
+.two-col { display: grid; grid-template-columns: 1fr; gap: 14px; }
+@media (min-width: 760px) { .two-col { grid-template-columns: 1fr 1fr; } }
+.nowrap-row { display:flex; gap:8px; flex-wrap: wrap; align-items:center; }
+.diag-box { margin-top:10px; border-radius:10px; padding:12px; font-size:13px; border:1px solid #343a4b; background:#0d0f14; }
+.diag-ok { border-color:#2f7d5b; background:rgba(52,211,153,.08); }
+.diag-warn { border-color:#9a7a20; background:rgba(234,179,8,.08); }
+.diag-err { border-color:#8a2d2d; background:rgba(239,68,68,.08); }
+.st-badge { display:inline-block; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; }
+.st-ok { background:rgba(52,211,153,.16); color:#6ee7b7; border:1px solid rgba(52,211,153,.4); }
+.st-aviso { background:rgba(234,179,8,.16); color:#fde68a; border:1px solid rgba(234,179,8,.4); }
+.st-erro { background:rgba(239,68,68,.16); color:#fca5a5; border:1px solid rgba(239,68,68,.4); }
+.st-nao { background:rgba(156,163,175,.12); color:#b4bac6; border:1px solid rgba(156,163,175,.3); }
+.erro-player { position:absolute; inset:0; background:#000; color:#f4f1ea; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:28px; gap:10px; z-index:8; }
+.erro-player h2 { color:#fff; font-size:clamp(24px,4vw,44px); margin:0; }
+.erro-player .url { color:#9aa1b2; font-size:13px; word-break:break-all; max-width:900px; }
+.erro-player .motivo { font-size:clamp(18px,2.6vw,28px); color:#fde68a; max-width:980px; }
+.erro-player .acao { font-size:clamp(16px,2.2vw,22px); color:#f4f1ea; max-width:980px; }
+.health-bar { display:flex; gap:12px; flex-wrap:wrap; }
+@media print {
+.app-header, .footer-line, button, .no-print { display:none !important; }
+html, body { background:#fff; color:#000; }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+<div class="wrap" style="padding-bottom:12px;">
+<div class="nowrap-row" style="justify-content:space-between;">
+<div>
+<span class="eyebrow-pill">Sinalização digital</span>
+<h1 style="font-size:22px; margin:8px 0 2px;">Central de Telas</h1>
+<div class="muted-dark" style="font-size:13px;">Gerencie vídeos, playlists, telas e a programação das TVs do shopping.</div>
+</div>
+<div class="nowrap-row">
+<span class="badge badge-on" id="badgeTelasAtivas">3 telas ativas</span>
+<button class="btn-ghost" id="btnResetDemo">Restaurar exemplos</button>
+</div>
+</div>
+<nav class="tabs-pill" role="tablist" aria-label="Seções do painel" style="margin-top:14px;">
+<button class="pill" role="tab" data-tab="videos" aria-selected="true">Vídeos</button>
+<button class="pill" role="tab" data-tab="playlists" aria-selected="false">Playlists</button>
+<button class="pill" role="tab" data-tab="telas" aria-selected="false">Telas</button>
+<button class="pill" role="tab" data-tab="agenda" aria-selected="false">Agendamento</button>
+<button class="pill" role="tab" data-tab="publicar" aria-selected="false">Publicar</button>
+</nav>
+</div>
+</header>
+
+<main class="wrap" id="painel" style="flex:1;"></main>
+
+<div class="footer-line" id="footerPainel">Central de Telas — sinalização digital para TVs</div>
+
+<dialog class="dlg" id="dlgPreview">
+<div class="dlg-inner">
+<div class="nowrap-row" style="justify-content:space-between; margin-bottom:10px;">
+<h3 id="dlgPreviewTitle" style="margin:0; font-size:17px;">Pré-visualização</h3>
+<button class="btn-ghost" id="btnClosePreview">Fechar</button>
+</div>
+<div style="background:#000; border-radius:10px; overflow:hidden; aspect-ratio:16/9;">
+<video id="previewVideo" controls style="width:100%; height:100%; object-fit:contain; background:#000;"></video>
+</div>
+<div class="helper" id="previewHint">Se o vídeo não carregar, verifique a URL ou o formato do arquivo.</div>
+</div>
+</dialog>
+
+<dialog class="dlg" id="dlgConfirm">
+<div class="dlg-inner">
+<h3 id="dlgConfirmTitle" style="margin:0 0 8px; font-size:17px;">Confirmar ação</h3>
+<p class="muted-dark" id="dlgConfirmText" style="margin:0 0 16px; font-size:14px;"></p>
+<div class="nowrap-row" style="justify-content:flex-end;">
+<button class="btn-ghost" id="btnConfirmNo">Cancelar</button>
+<button class="btn-danger" id="btnConfirmYes">Confirmar</button>
+</div>
+</div>
+</dialog>
+
+<script>
+/* =========================================================
+   1. DADOS, PERSISTÊNCIA E UTILITÁRIOS
+   ========================================================= */
+const STORE_KEY = "signage_v1";
+const DIAS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
+const DIAS_LONGO = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
+
+function uid(p) { return p + "_" + Math.random().toString(36).slice(2, 9); }
+
+function dadosIniciais() {
+const v1 = uid("vid"), v2 = uid("vid");
+const p1 = uid("pl"), p2 = uid("pl");
+return {
+videos: [
+{ id: v1, nome: "Big Buck Bunny (amostra)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", duracaoEstimada: 596, ativo: true },
+{ id: v2, nome: "For Bigger Joyrides (amostra)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", duracaoEstimada: 15, ativo: true }
+],
+playlists: [
+{ id: p1, nome: "Vitrine Principal", itens: [v1, v2], agendamento: [ { dias: [1,2,3,4,5], inicio: "10:00", fim: "22:00" }, { dias: [0,6], inicio: "12:00", fim: "21:00" } ], loop: true },
+{ id: p2, nome: "Promoções", itens: [v2], agendamento: [ { dias: [1,2,3,4,5,6], inicio: "09:00", fim: "13:00" } ], loop: true }
+],
+telas: [
+{ id: uid("tela"), nome: "TV Entrada Principal", local: "Piso térreo", playlistId: p1, ativa: true },
+{ id: uid("tela"), nome: "TV Praça de Alimentação", local: "Piso L3", playlistId: p2, ativa: true },
+{ id: uid("tela"), nome: "TV Corredor L2", local: "Piso L2", playlistId: p1, ativa: false }
+],
+config: { intervaloRefreshMin: 5, telaPadrao: null, corDestaque: "#d4a24c", foraHorario: "espera" },
+ultimoExport: null
+};
+}
+
+function carregarEstado() {
+try {
+const raw = localStorage.getItem(STORE_KEY);
+if (raw) {
+const d = JSON.parse(raw);
+if (d && Array.isArray(d.videos)) return d;
+}
+} catch (e) {}
+const d = dadosIniciais();
+d.config.telaPadrao = d.telas[0].id;
+salvarEstado(d);
+return d;
+}
+
+function salvarEstado(d) {
+try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) {}
+}
+
+let estado = carregarEstado();
+let abaAtiva = "videos";
+
+function escHtml(s) {
+return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function fmtDuracao(seg) {
+if (seg == null || isNaN(seg) || seg <= 0) return "--";
+const m = Math.floor(seg / 60), s = Math.round(seg % 60);
+return m + ":" + String(s).padStart(2, "0");
+}
+
+function duracaoPlaylist(pl) {
+let total = 0, validos = 0;
+pl.itens.forEach(id => {
+const v = estado.videos.find(x => x.id === id);
+if (v && v.duracaoEstimada) { total += v.duracaoEstimada; validos++; }
+});
+return { total, validos };
+}
+
+function toast(msg, opt) {
+if (window.skipUI && skipUI.toast) skipUI.toast(msg, opt || {});
+}
+
+function urlValida(u) {
+if (!u) return false;
+try {
+const x = new URL(u.trim());
+return x.protocol === "http:" || x.protocol === "https:";
+} catch (e) { return false; }
+}
+
+function ehYoutube(u) { return /youtube\.com|youtu\.be/i.test(u); }
+
+function minutos(hhmm) {
+const [h, m] = String(hhmm).split(":").map(Number);
+return h * 60 + m;
+}
+
+function janelaAtiva(janela, date) {
+const dia = date.getDay();
+if (!janela.dias.includes(dia)) return false;
+const agora = date.getHours() * 60 + date.getMinutes();
+const ini = minutos(janela.inicio), fim = minutos(janela.fim);
+if (ini <= fim) return agora >= ini && agora < fim;
+return agora >= ini || agora < fim;
+}
+
+function playlistAtivaAgora(pl, date) {
+return (pl.agendamento || []).some(j => janelaAtiva(j, date));
+}
+
+function regraTexto(pl) {
+if (!pl.agendamento || !pl.agendamento.length) return "Sem janela – exibição contínua";
+return pl.agendamento.map(j => {
+const dias = descreveDias(j.dias);
+return dias + ", " + j.inicio + "–" + j.fim;
+}).join(" · ");
+}
+
+function descreveDias(dias) {
+const s = [...dias].sort((a,b)=>a-b);
+if (s.length === 7) return "Todos os dias";
+if (s.join() === "1,2,3,4,5") return "Seg a Sex";
+if (s.join() === "0,6") return "Sáb e Dom";
+if (s.join() === "1,2,3,4,5,6") return "Seg a Sáb";
+return s.map(d => DIAS[d]).join(", ");
+}
+
+/* =========================================================
+   2. CONFIGURAÇÃO REMOTA (usada pelo player via ?config=)
+   ========================================================= */
+const CACHE_REMOTO_KEY = "signage_v1_cache_remoto";
+
+function exportarObjeto() {
+return { videos: estado.videos, playlists: estado.playlists, telas: estado.telas, config: estado.config, ultimoExport: new Date().toISOString() };
+}
+
+/* =========================================================
+   3. RENDER DO PAINEL (por aba)
+   ========================================================= */
+const painel = document.getElementById("painel");
+
+function setAba(aba) {
+abaAtiva = aba;
+document.querySelectorAll(".pill").forEach(b => b.setAttribute("aria-selected", b.dataset.tab === aba ? "true" : "false"));
+renderPainel();
+}
+
+function renderPainel() {
+const telasAtivas = estado.telas.filter(t => t.ativa).length;
+document.getElementById("badgeTelasAtivas").textContent = telasAtivas + (telasAtivas === 1 ? " tela ativa" : " telas ativas");
+const fns = { videos: renderVideos, playlists: renderPlaylists, telas: renderTelas, agenda: renderAgenda, publicar: renderPublicar };
+painel.innerHTML = "";
+const wrap = document.createElement("div");
+wrap.className = "fade-in";
+painel.appendChild(wrap);
+fns[abaAtiva](wrap);
+}
+
+/* ---------- ABA VÍDEOS ---------- */
+function renderVideos(root) {
+const ativos = estado.videos.filter(v => v.ativo).length;
+root.innerHTML = `
+<section class="card-dark" style="margin-bottom:18px;">
+<div class="nowrap-row" style="justify-content:space-between;">
+<div>
+<h2 class="section-title">Biblioteca de vídeos</h2>
+<div class="muted-dark" style="font-size:13px;">Cadastre links de vídeo para usar nas playlists. ${ativos} de ${estado.videos.length} ativos.</div>
+</div>
+<span class="badge badge-on">${ativos} ativos</span>
+</div>
+</section>
+
+<section class="card-dark" style="margin-bottom:18px;">
+<h3 style="margin:0 0 4px; font-size:16px;">Adicionar vídeo por link</h3>
+<div class="muted-dark" style="font-size:13px; margin-bottom:14px;">Aceita MP4, HLS (.m3u8) ou link do YouTube.</div>
+<form id="formVideo" class="two-col" style="grid-template-columns:1fr;">
+<div>
+<label class="lbl" for="vNome">Nome</label>
+<input class="inp" id="vNome" placeholder="Ex.: Campanha Dia das Mães" maxlength="80" required>
+<div class="helper">Nome que aparece nas playlists e no painel.</div>
+</div>
+<div>
+<label class="lbl" for="vUrl">URL do vídeo</label>
+<input class="inp" id="vUrl" placeholder="https://exemplo.com/video.mp4" required>
+<div class="helper" id="vUrlHelp">Use um endereço público começando com http:// ou https://.</div>
+<div class="nowrap-row" style="margin-top:8px;">
+<button class="btn-ghost" type="button" id="btnTestarLink">Testar link</button>
+<button class="btn-ghost" type="button" id="btnColarTestar">Colar e testar</button>
+</div>
+<div id="painelDiag"></div>
+<div class="helper" style="font-size:11px; margin-top:6px;">Formatos que funcionam em qualquer navegador: MP4 com vídeo H.264 e áudio AAC. MOV, MKV e HEVC não tocam.</div>
+</div>
+<div class="nowrap-row">
+<button class="btn-gold" type="submit">Adicionar</button>
+</div>
+</form>
+</section>
+
+<section class="card-dark" style="margin-bottom:18px;">
+<h3 style="margin:0 0 4px; font-size:16px;">Ou envie um arquivo do aparelho (modo teste local)</h3>
+<div class="muted-dark" style="font-size:12px; margin-bottom:10px;">
+O arquivo enviado só funciona no mesmo navegador e não sincroniza entre TVs. Para operação remota, use links.
+</div>
+<input type="file" id="vFile" accept="video/*" class="inp" style="padding:8px;">
+</section>
+
+<section>
+<div class="nowrap-row" style="justify-content:space-between; margin-bottom:12px;">
+<h3 style="margin:0; font-size:16px;">Vídeos cadastrados</h3>
+<button class="btn-gold" type="button" id="btnTestarTodos">Testar todos</button>
+</div>
+<div id="painelRelatorio"></div>
+<div class="grid-cards" id="gridVideos"></div>
+</section>`;
+
+root.querySelector("#btnTestarLink").addEventListener("click", () => {
+testarUrlNoPainel(root.querySelector("#vUrl").value.trim(), root);
+});
+root.querySelector("#btnColarTestar").addEventListener("click", async () => {
+try {
+const txt = await navigator.clipboard.readText();
+root.querySelector("#vUrl").value = txt.trim();
+testarUrlNoPainel(txt.trim(), root);
+} catch (e) { toast("Não foi possível ler a área de transferência.", { type: "error" }); }
+});
+root.querySelector("#btnTestarTodos").addEventListener("click", () => testarTodosVideos(root));
+
+root.querySelector("#formVideo").addEventListener("submit", e => {
+e.preventDefault();
+const nome = root.querySelector("#vNome").value.trim();
+const url = root.querySelector("#vUrl").value.trim();
+const help = root.querySelector("#vUrlHelp");
+if (!nome) { toast("Informe um nome para o vídeo.", { type: "error" }); return; }
+if (!urlValida(url)) {
+help.textContent = "URL inválida. Use um endereço completo com http:// ou https://.";
+help.style.color = "#f08a8a";
+toast("URL inválida.", { type: "error" });
+return;
+}
+const novo = { id: uid("vid"), nome, tipo: "url", src: url, duracaoEstimada: null, ativo: true, status: "nao_testado", motivo: "", testadoEm: null };
+estado.videos.push(novo);
+salvarEstado(estado);
+toast("Vídeo adicionado à biblioteca.", { type: "success" });
+renderPainel();
+testarVideoEmSegundoPlano(novo);
+});
+
+root.querySelector("#vFile").addEventListener("change", e => {
+const f = e.target.files[0];
+if (!f) return;
+const reader = new FileReader();
+reader.onload = () => {
+estado.videos.push({ id: uid("vid"), nome: f.name, tipo: "upload", src: reader.result, duracaoEstimada: null, ativo: true, status: "nao_testado", motivo: "" });
+try { salvarEstado(estado); toast("Arquivo local adicionado (apenas neste navegador).", { type: "success" }); }
+catch (err) { toast("Arquivo grande demais para armazenar localmente.", { type: "error" }); estado.videos.pop(); }
+renderPainel();
+};
+reader.readAsDataURL(f);
+});
+
+const grid = root.querySelector("#gridVideos");
+if (!estado.videos.length) {
+grid.innerHTML = `<div class="card-dark muted-dark">Nenhum vídeo cadastrado ainda. Adicione um link acima.</div>`;
+}
+estado.videos.forEach(v => {
+const card = document.createElement("div");
+card.className = "card-dark";
+card.innerHTML = `
+<div class="nowrap-row" style="justify-content:space-between; align-items:flex-start;">
+<div style="min-width:0;">
+<div style="font-weight:600; font-size:15px; word-break:break-word;">${escHtml(v.nome)}</div>
+<div class="nowrap-row" style="margin-top:6px;">
+<span class="badge ${v.tipo === "url" ? "badge-link" : "badge-local"}">${v.tipo === "url" ? "Link" : "Local"}</span>
+<span class="muted-dark" style="font-size:12px;" data-dur>Duração: ${fmtDuracao(v.duracaoEstimada)}</span>
+</div>
+<div class="nowrap-row" style="margin-top:6px;">${selo(v.status)}</div>
+${v.motivo ? `<div class="helper" style="margin-top:6px;">${escHtml(v.motivo)}</div>` : ""}
+</div>
+<span class="badge ${v.ativo ? "badge-on" : "badge-off"}">${v.ativo ? "Ativo" : "Inativo"}</span>
+</div>
+<div class="muted-dark" style="font-size:12px; margin:10px 0; word-break:break-all;">${v.tipo === "url" ? escHtml(v.src) : "Arquivo carregado no navegador"}</div>
+<div class="nowrap-row">
+<button class="btn-ghost" data-play>▶ Pré-visualizar</button>
+<button class="btn-ghost" data-retest>Testar</button>
+<button class="btn-ghost" data-toggle>${v.ativo ? "Desativar" : "Ativar"}</button>
+<button class="btn-danger" data-del>Remover</button>
+</div>`;
+card.querySelector("[data-play]").addEventListener("click", () => abrirPreview(v));
+card.querySelector("[data-retest]").addEventListener("click", () => testarVideoEmSegundoPlano(v, true));
+card.querySelector("[data-toggle]").addEventListener("click", () => {
+v.ativo = !v.ativo; salvarEstado(estado); renderPainel();
+toast(v.ativo ? "Vídeo ativado." : "Vídeo desativado.");
+});
+card.querySelector("[data-del]").addEventListener("click", () => {
+confirmar("Remover vídeo", `"${v.nome}" será removido das playlists onde estiver.`, () => {
+estado.videos = estado.videos.filter(x => x.id !== v.id);
+estado.playlists.forEach(p => p.itens = p.itens.filter(i => i !== v.id));
+salvarEstado(estado); renderPainel();
+toast("Vídeo removido.", { type: "success" });
+});
+});
+grid.appendChild(card);
+});
+}
+
+function selo(status) {
+const mapa = {
+ok: ["st-ok", "Verificado"],
+aviso: ["st-aviso", "Com ressalva"],
+erro: ["st-erro", "Falhou"],
+nao_testado: ["st-nao", "Não testado"]
+};
+const m = mapa[status] || mapa.nao_testado;
+return `<span class="st-badge ${m[0]}">${m[1]}</span>`;
+}
+
+/* ---------- DIAGNÓSTICO DE LINK ---------- */
+const ERROS_MEDIA = {
+1: "O carregamento foi interrompido. Provavelmente o link expirou ou o acesso foi bloqueado.",
+2: "Falha de rede ao baixar o vídeo. Pode ser bloqueio de acesso, cota do Drive excedida ou link fora do ar.",
+3: "O arquivo foi encontrado, mas o navegador não conseguiu decodificar. O codec não é compatível — converta para MP4 com vídeo H.264 e áudio AAC.",
+4: "O endereço não entrega um vídeo que o navegador reconheça. Causas mais comuns: link de visualização em vez de arquivo, compartilhamento restrito, arquivo acima de 100 MB no Drive, ou formato incompatível (MOV/HEVC)."
+};
+const ACOES_MEDIA = {
+1: "Gere um novo link e teste novamente.",
+2: "Verifique o compartilhamento no Drive e aguarde a cota liberar.",
+3: "Converta para MP4 H.264 + AAC.",
+4: "Use o link direto do arquivo (uc?export=download&id=ID) ou converta para MP4 H.264."
+};
+
+function extrairIdDrive(u) {
+const m = u.match(/\/file\/d\/([^/?#]+)/) || u.match(/[?&]id=([^&#]+)/);
+return m ? m[1] : null;
+}
+
+function analisarUrl(url) {
+const r = { nivel: "erro", msg: "", acao: "", convertivel: null, extensao: false };
+if (!url) { r.msg = "Cole uma URL antes de testar."; r.acao = "Cole o endereço do vídeo no campo."; return r; }
+if (!/^https?:\/\//i.test(url)) { r.msg = "A URL precisa começar com https://"; r.acao = "Inclua https:// no início do endereço."; return r; }
+if (url.includes("drive.google.com/file/d/") || url.includes("drive.google.com/open?id=") || /\/view(\?usp=sharing)?$/.test(url)) {
+r.nivel = "aviso";
+r.msg = "Este é o link de visualização do Drive, não o link do arquivo. O player recebe uma página HTML e não consegue tocar. Use o link direto uc?export=download&id=ID.";
+r.acao = "Use o botão Converter para link direto.";
+const id = extrairIdDrive(url);
+if (id) r.convertivel = "https://drive.google.com/uc?export=download&id=" + id;
+return r;
+}
+if (url.includes("google.com/thumbnail")) { r.msg = "Este endereço serve apenas para imagens, não para vídeo."; r.acao = "Use o link do arquivo de vídeo."; return r; }
+if (ehYoutube(url)) { r.nivel = "aviso"; r.msg = "Link do YouTube não toca direto no player. Use um arquivo MP4 ou o link direto de um vídeo hospedado."; r.acao = "Substitua por um arquivo MP4."; return r; }
+if (url.includes("dropbox.com") && !/[?&](raw=1|dl=1)/.test(url)) { r.nivel = "aviso"; r.msg = "Adicione ?raw=1 ao final do link do Dropbox."; r.acao = "Acrescente ?raw=1 ao endereço."; return r; }
+const semQuery = url.split(/[?#]/)[0];
+if (/\.(mp4|webm|m4v|mov|m3u8|ts)$/i.test(semQuery)) { r.nivel = "ok"; r.extensao = true; r.msg = "Extensão reconhecida."; return r; }
+r.nivel = "aviso";
+r.msg = "A URL não termina em um arquivo de vídeo. Isso costuma indicar que o endereço aponta para uma página, não para o vídeo.";
+r.acao = "Confira se o link aponta direto para o arquivo.";
+return r;
+}
+
+function testarCarregamento(url) {
+return new Promise(resolve => {
+const v = document.createElement("video");
+v.preload = "metadata"; v.muted = true; v.playsinline = true;
+v.style.cssText = "position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;";
+document.body.appendChild(v);
+let feito = false;
+const fim = (res) => {
+if (feito) return; feito = true;
+clearTimeout(timer);
+v.removeAttribute("src"); v.load(); v.remove();
+resolve(res);
+};
+const timer = setTimeout(() => fim({ ok: false, codigo: null, msg: "Sem resposta em 12 segundos. O servidor não devolveu o vídeo: pode ser link restrito, arquivo bloqueado por excesso de acessos ou endereço inexistente.", acao: "Confira se o compartilhamento está público e se o endereço existe." }), 12000);
+v.addEventListener("loadedmetadata", () => {
+const d = isFinite(v.duration) ? Math.round(v.duration) : null;
+fim({ ok: true, duracao: d, largura: v.videoWidth, altura: v.videoHeight });
+});
+v.addEventListener("error", () => {
+const c = v.error ? v.error.code : 4;
+fim({ ok: false, codigo: c, msg: ERROS_MEDIA[c] || ERROS_MEDIA[4], acao: ACOES_MEDIA[c] || ACOES_MEDIA[4] });
+});
+v.src = url;
+v.load();
+});
+}
+
+async function diagnosticarUrl(url) {
+const a = analisarUrl(url);
+if (a.nivel === "erro" || (a.nivel === "aviso" && !a.extensao && !url.includes("drive.google.com"))) {
+return { status: a.nivel === "erro" ? "erro" : "aviso", msg: a.msg, acao: a.acao, url, codigo: null, convertivel: a.convertivel, duracao: null, dimensao: null };
+}
+if (a.nivel === "aviso") {
+return { status: "aviso", msg: a.msg, acao: a.acao, url, codigo: null, convertivel: a.convertivel, duracao: null, dimensao: null };
+}
+const b = await testarCarregamento(url);
+if (b.ok) {
+const dim = b.largura && b.altura ? b.largura + "x" + b.altura : null;
+return { status: a.extensao && a.msg === "Extensão reconhecida." ? "ok" : "ok", msg: "Vídeo carregou" + (b.duracao != null ? ": " + fmtDuracao(b.duracao) : "") + (dim ? ", " + dim : "") + ".", acao: "Nenhuma ação necessária.", url, codigo: null, convertivel: null, duracao: b.duracao, dimensao: dim };
+}
+return { status: "erro", msg: b.msg, acao: b.acao, url, codigo: b.codigo, convertivel: null, duracao: null, dimensao: null };
+}
+
+function renderResultadoDiag(res) {
+const cls = res.status === "ok" ? "diag-ok" : res.status === "aviso" ? "diag-warn" : "diag-err";
+const selo2 = res.status === "ok" ? "Funcionou" : res.status === "aviso" ? "Funcionou com ressalva" : "Não funciona";
+const cod = res.codigo ? `<div class="helper">Código do erro do navegador: ${res.codigo}</div>` : "";
+return `<div class="diag-box ${cls}" role="status">
+<div style="font-weight:600; margin-bottom:4px;">${selo2}</div>
+<div>${escHtml(res.msg)}</div>
+${cod}
+<div style="margin-top:6px;"><strong>Ação:</strong> ${escHtml(res.acao)}</div>
+<div class="helper" style="word-break:break-all; margin-top:6px;">${escHtml(res.url || "")}</div>
+${res.convertivel ? `<div class="nowrap-row" style="margin-top:8px;"><button class="btn-ghost" type="button" data-conv="${escHtml(res.convertivel)}">Converter para link direto</button></div>` : ""}
+</div>`;
+}
+
+async function testarUrlNoPainel(url, root) {
+const painel = root.querySelector("#painelDiag");
+const btn = root.querySelector("#btnTestarLink");
+const btn2 = root.querySelector("#btnColarTestar");
+btn.disabled = true; btn2.disabled = true;
+btn.textContent = "⏳ Testando…";
+painel.innerHTML = `<div class="helper" style="margin-top:8px;">⏳ Testando…</div>`;
+const res = await diagnosticarUrl(url);
+painel.innerHTML = renderResultadoDiag(res);
+const conv = painel.querySelector("[data-conv]");
+if (conv) conv.addEventListener("click", () => {
+root.querySelector("#vUrl").value = conv.dataset.conv;
+testarUrlNoPainel(conv.dataset.conv, root);
+});
+btn.disabled = false; btn2.disabled = false;
+btn.textContent = "Testar link";
+}
+
+async function testarVideoEmSegundoPlano(v, reRender) {
+const res = await diagnosticarUrl(v.src);
+v.status = res.status === "ok" ? "ok" : res.status === "aviso" ? "aviso" : "erro";
+v.motivo = res.status === "ok" ? "" : res.msg;
+v.testadoEm = new Date().toISOString();
+if (res.duracao) v.duracaoEstimada = res.duracao;
+salvarEstado(estado);
+if (abaAtiva === "videos" && (reRender || true)) renderPainel();
+return res;
+}
+
+async function testarTodosVideos(root) {
+const lista = estado.videos.filter(v => v.tipo === "url");
+const rel = root.querySelector("#painelRelatorio");
+const resultados = [];
+for (let i = 0; i < lista.length; i++) {
+rel.innerHTML = `<div class="helper" style="margin-bottom:10px;">Testando ${i + 1} de ${lista.length}…</div>`;
+const res = await testarVideoEmSegundoPlano(lista[i]);
+resultados.push({ nome: lista[i].nome, res });
+}
+const ok = resultados.filter(r => r.res.status === "ok").length;
+const av = resultados.filter(r => r.res.status === "aviso").length;
+const fa = resultados.filter(r => r.res.status === "erro").length;
+rel.innerHTML = `<div class="card-dark" style="margin-bottom:12px;">
+<div class="health-bar" style="margin-bottom:10px;"><strong>${ok} funcionando, ${av} com ressalva, ${fa} falhou</strong></div>
+${resultados.map(r => `<div class="row-line" style="margin-bottom:6px;"><span class="nm">${escHtml(r.nome)}</span>${selo(r.res.status === "ok" ? "ok" : r.res.status === "aviso" ? "aviso" : "erro")}<span class="helper" style="max-width:340px;">${escHtml(r.res.status === "ok" ? "" : r.res.msg)}</span></div>`).join("")}
+</div>`;
+renderPainel();
+}
+
+function abrirPreview(v) {
+const dlg = document.getElementById("dlgPreview");
+const vid = document.getElementById("previewVideo");
+document.getElementById("dlgPreviewTitle").textContent = v.nome;
+vid.src = v.src;
+vid.onloadedmetadata = () => {
+if (isFinite(vid.duration)) {
+v.duracaoEstimada = Math.round(vid.duration);
+salvarEstado(estado);
+document.getElementById("previewHint").textContent = "Duração detectada: " + fmtDuracao(v.duracaoEstimada) + ".";
+}
+};
+vid.onerror = async () => {
+const c = vid.error ? vid.error.code : 4;
+const hint = document.getElementById("previewHint");
+hint.innerHTML = `<div>${escHtml(ERROS_MEDIA[c] || ERROS_MEDIA[4])}</div><div style="margin-top:6px;"><strong>Ação:</strong> ${escHtml(ACOES_MEDIA[c] || ACOES_MEDIA[4])}</div><div class="nowrap-row" style="margin-top:8px;"><button class="btn-ghost" id="btnTestarPreview" type="button">Testar link</button></div>`;
+document.getElementById("btnTestarPreview").addEventListener("click", () => testarVideoEmSegundoPlano(v, true));
+v.status = "erro"; v.motivo = ERROS_MEDIA[c] || ERROS_MEDIA[4]; salvarEstado(estado);
+};
+dlg.showModal();
+vid.play().catch(() => {});
+}
+
+document.getElementById("btnClosePreview").addEventListener("click", () => {
+const vid = document.getElementById("previewVideo");
+vid.pause(); vid.removeAttribute("src"); vid.load();
+document.getElementById("dlgPreview").close();
+});
+
+/* ---------- ABA PLAYLISTS ---------- */
+function renderPlaylists(root) {
+root.innerHTML = `
+<section class="card-dark" style="margin-bottom:18px;">
+<div class="nowrap-row" style="justify-content:space-between;">
+<div>
+<h2 class="section-title">Playlists</h2>
+<div class="muted-dark" style="font-size:13px;">Monte a sequência de vídeos que cada tela exibe. Use ↑ ↓ para reordenar.</div>
+</div>
+<button class="btn-gold" id="btnNovaPlaylist">+ Nova playlist</button>
+</div>
+</section>
+<div id="listaPlaylists" class="two-col" style="grid-template-columns:1fr; gap:16px;"></div>`;
+
+root.querySelector("#btnNovaPlaylist").addEventListener("click", () => {
+estado.playlists.push({ id: uid("pl"), nome: "Nova playlist", itens: [], agendamento: [], loop: true });
+salvarEstado(estado); renderPainel();
+toast("Playlist criada. Edite o nome diretamente no cartão.", { type: "success" });
+});
+
+const lista = root.querySelector("#listaPlaylists");
+if (!estado.playlists.length) lista.innerHTML = `<div class="card-dark muted-dark">Nenhuma playlist. Crie a primeira acima.</div>`;
+
+estado.playlists.forEach(pl => {
+const dur = duracaoPlaylist(pl);
+const card = document.createElement("div");
+card.className = "card-dark";
+const disponiveis = estado.videos.filter(v => !pl.itens.includes(v.id));
+card.innerHTML = `
+<div class="nowrap-row" style="justify-content:space-between; margin-bottom:10px;">
+<input class="inp" style="max-width:340px; font-weight:600; font-size:16px;" value="${escHtml(pl.nome)}" data-nome aria-label="Nome da playlist">
+<div class="nowrap-row">
+<span class="badge badge-link">${pl.itens.length} ${pl.itens.length === 1 ? "item" : "itens"}</span>
+<span class="badge badge-local">${dur.total ? "≈ " + fmtDuracao(dur.total) : "Duração --"}</span>
+</div>
+</div>
+<div class="helper" style="margin-bottom:12px;">Duração total estimada de ${dur.validos} de ${pl.itens.length} vídeos com metadados detectados.</div>
+<div class="stack-items" data-itens></div>
+<div style="margin-top:12px;">
+<label class="lbl">Adicionar vídeo</label>
+<select class="inp" data-add>
+<option value="">Adicionar vídeo…</option>
+${disponiveis.map(v => `<option value="${v.id}">${escHtml(v.nome)}</option>`).join("")}
+</select>
+</div>
+<div class="nowrap-row" style="justify-content:space-between; margin-top:14px;">
+<span class="muted-dark" style="font-size:12px;">Loop contínuo: volta ao primeiro vídeo ao final.</span>
+<button class="btn-danger" data-excluir>Excluir playlist</button>
+</div>`;
+
+card.querySelector("[data-nome]").addEventListener("change", e => {
+pl.nome = e.target.value.trim() || "Sem nome";
+salvarEstado(estado); toast("Nome da playlist salvo.", { type: "success" }); renderPainel();
+});
+
+const itensEl = card.querySelector("[data-itens]");
+if (!pl.itens.length) itensEl.innerHTML = `<div class="muted-dark" style="font-size:13px; padding:8px 0;">Esta playlist ainda não tem vídeos.</div>`;
+pl.itens.forEach((id, idx) => {
+const v = estado.videos.find(x => x.id === id);
+const row = document.createElement("div");
+row.className = "row-line";
+row.style.marginBottom = "8px";
+row.innerHTML = `
+<span class="muted-dark" style="width:22px; font-size:13px;">${idx + 1}</span>
+<span class="nm">${v ? escHtml(v.nome) : "<em>Vídeo removido</em>"} ${v && !v.ativo ? '<span class="badge badge-off">inativo</span>' : ""}</span>
+<button class="icon-btn" data-up ${idx === 0 ? "disabled" : ""} aria-label="Mover para cima">↑</button>
+<button class="icon-btn" data-down ${idx === pl.itens.length - 1 ? "disabled" : ""} aria-label="Mover para baixo">↓</button>
+<button class="icon-btn" data-rm aria-label="Remover da playlist">✕</button>`;
+row.querySelector("[data-up]").addEventListener("click", () => {
+[pl.itens[idx - 1], pl.itens[idx]] = [pl.itens[idx], pl.itens[idx - 1]];
+salvarEstado(estado); renderPainel();
+});
+row.querySelector("[data-down]").addEventListener("click", () => {
+[pl.itens[idx + 1], pl.itens[idx]] = [pl.itens[idx], pl.itens[idx + 1]];
+salvarEstado(estado); renderPainel();
+});
+row.querySelector("[data-rm]").addEventListener("click", () => {
+pl.itens.splice(idx, 1); salvarEstado(estado); renderPainel();
+toast("Vídeo removido da playlist.");
+});
+itensEl.appendChild(row);
+});
+
+card.querySelector("[data-add]").addEventListener("change", e => {
+if (!e.target.value) return;
+pl.itens.push(e.target.value);
+salvarEstado(estado); renderPainel();
+toast("Vídeo adicionado à playlist.", { type: "success" });
+});
+
+card.querySelector("[data-excluir]").addEventListener("click", () => {
+confirmar("Excluir playlist", `"${pl.nome}" será excluída. As telas vinculadas ficarão sem playlist.`, () => {
+estado.playlists = estado.playlists.filter(p => p.id !== pl.id);
+estado.telas.forEach(t => { if (t.playlistId === pl.id) t.playlistId = null; });
+salvarEstado(estado); renderPainel();
+toast("Playlist excluída.", { type: "success" });
+});
+});
+lista.appendChild(card);
+});
+}
+
+/* ---------- ABA TELAS ---------- */
+function renderTelas(root) {
+const ativas = estado.telas.filter(t => t.ativa).length;
+root.innerHTML = `
+<section class="card-dark" style="margin-bottom:18px;">
+<div class="nowrap-row" style="justify-content:space-between;">
+<div>
+<h2 class="section-title">Telas do shopping</h2>
+<div class="muted-dark" style="font-size:13px;">Cada TV tem um link próprio. Abra o link na TV em modo tela cheia.</div>
+</div>
+<div class="nowrap-row">
+<span class="badge badge-on">${ativas} ativas</span>
+<button class="btn-gold" id="btnNovaTela">+ Nova tela</button>
+</div>
+</div>
+</section>
+<div id="formNovaTela" style="display:none; margin-bottom:18px;" class="card-dark">
+<h3 style="margin:0 0 12px; font-size:16px;">Cadastrar nova tela</h3>
+<div class="two-col">
+<div>
+<label class="lbl" for="tNome">Nome</label>
+<input class="inp" id="tNome" placeholder="Ex.: TV Corredor Norte">
+<div class="helper">Nome interno para identificar o ponto.</div>
+</div>
+<div>
+<label class="lbl" for="tLocal">Local</label>
+<input class="inp" id="tLocal" placeholder="Ex.: Piso L1">
+<div class="helper">Onde a TV está instalada.</div>
+</div>
+<div>
+<label class="lbl" for="tPl">Playlist vinculada</label>
+<select class="inp" id="tPl">
+${estado.playlists.map(p => `<option value="${p.id}">${escHtml(p.nome)}</option>`).join("")}
+</select>
+</div>
+</div>
+<div class="nowrap-row" style="margin-top:12px; justify-content:flex-end;">
+<button class="btn-ghost" id="btnCancelTela">Cancelar</button>
+<button class="btn-gold" id="btnSalvarTela">Salvar tela</button>
+</div>
+</div>
+<div class="grid-cards" id="gridTelas"></div>`;
+
+const form = root.querySelector("#formNovaTela");
+root.querySelector("#btnNovaTela").addEventListener("click", () => {
+form.style.display = form.style.display === "none" ? "block" : "none";
+});
+root.querySelector("#btnCancelTela").addEventListener("click", () => form.style.display = "none");
+root.querySelector("#btnSalvarTela").addEventListener("click", () => {
+const nome = root.querySelector("#tNome").value.trim();
+const local = root.querySelector("#tLocal").value.trim();
+const playlistId = root.querySelector("#tPl").value || null;
+if (!nome) { toast("Informe o nome da tela.", { type: "error" }); return; }
+const t = { id: uid("tela"), nome, local: local || "Não informado", playlistId, ativa: true };
+estado.telas.push(t);
+if (!estado.config.telaPadrao) estado.config.telaPadrao = t.id;
+salvarEstado(estado); renderPainel();
+toast("Tela cadastrada. Copie o link para a TV.", { type: "success" });
+});
+
+const grid = root.querySelector("#gridTelas");
+if (!estado.telas.length) grid.innerHTML = `<div class="card-dark muted-dark">Nenhuma tela cadastrada.</div>`;
+estado.telas.forEach(t => {
+const pl = estado.playlists.find(p => p.id === t.playlistId);
+const link = location.origin + location.pathname + "#/tela/" + t.id;
+const card = document.createElement("div");
+card.className = "card-dark";
+card.innerHTML = `
+<div class="nowrap-row" style="justify-content:space-between; align-items:flex-start;">
+<div style="min-width:0;">
+<div style="font-weight:600; font-size:15px;">${escHtml(t.nome)}</div>
+<div class="muted-dark" style="font-size:13px;">${escHtml(t.local)}</div>
+</div>
+<span class="badge ${t.ativa ? "badge-on" : "badge-off"}">${t.ativa ? "Ativa" : "Inativa"}</span>
+</div>
+<div class="helper" style="margin-top:12px;">Playlist</div>
+<div style="font-size:14px; margin-bottom:8px;">${pl ? escHtml(pl.nome) : '<span class="muted-dark">Sem playlist</span>'}</div>
+<div class="helper">Agendamento herdado</div>
+<div class="schedule-line" style="margin-bottom:12px;">${pl ? escHtml(regraTexto(pl)) : "—"}</div>
+<div class="helper">Link direto da TV</div>
+<div class="muted-dark" style="font-size:12px; word-break:break-all; background:#0d0f14; border:1px solid #262a35; border-radius:8px; padding:8px; margin:4px 0 12px;">${escHtml(link)}</div>
+<div class="nowrap-row">
+<button class="btn-gold" data-copy>Copiar link</button>
+<button class="btn-ghost" data-open>Abrir player</button>
+<button class="btn-ghost" data-toggle>${t.ativa ? "Desativar" : "Ativar"}</button>
+<button class="btn-danger" data-del>Remover</button>
+</div>`;
+card.querySelector("[data-copy]").addEventListener("click", () => copiarTexto(link, "Link da tela copiado."));
+card.querySelector("[data-open]").addEventListener("click", () => window.open("#/tela/" + t.id, "_blank"));
+card.querySelector("[data-toggle]").addEventListener("click", () => {
+t.ativa = !t.ativa; salvarEstado(estado); renderPainel();
+toast(t.ativa ? "Tela ativada." : "Tela desativada.");
+});
+card.querySelector("[data-del]").addEventListener("click", () => {
+confirmar("Remover tela", `"${t.nome}" deixará de exibir conteúdo.`, () => {
+estado.telas = estado.telas.filter(x => x.id !== t.id);
+if (estado.config.telaPadrao === t.id) estado.config.telaPadrao = estado.telas[0] ? estado.telas[0].id : null;
+salvarEstado(estado); renderPainel(); toast("Tela removida.", { type: "success" });
+});
+});
+grid.appendChild(card);
+});
+}
+
+function copiarTexto(txt, msg) {
+const ok = () => toast(msg, { type: "success" });
+if (navigator.clipboard && navigator.clipboard.writeText) {
+navigator.clipboard.writeText(txt).then(ok).catch(() => fallbackCopy(txt, ok));
+} else fallbackCopy(txt, ok);
+}
+function fallbackCopy(txt, ok) {
+const ta = document.createElement("textarea");
+ta.value = txt; document.body.appendChild(ta); ta.select();
+try { document.execCommand("copy"); ok(); } catch (e) { toast("Não foi possível copiar.", { type: "error" }); }
+ta.remove();
+}
+
+/* ---------- ABA AGENDAMENTO ---------- */
+let rascunhoJanela = { dias: [1,2,3,4,5], inicio: "10:00", fim: "22:00" };
+
+function renderAgenda(root) {
+const agora = new Date();
+const emExecucao = resumoAgora(agora);
+root.innerHTML = `
+<section class="card-dark" style="margin-bottom:18px; background:linear-gradient(135deg, rgba(212,162,76,.12), #161922);">
+<div class="muted-dark" style="font-size:12px; text-transform:uppercase; letter-spacing:.08em;">Agora no shopping</div>
+<div style="font-size:18px; margin-top:6px;" id="resumoAgora">${escHtml(emExecucao)}</div>
+<div class="helper" style="margin-top:8px;">Atualizado com base no horário atual deste aparelho (${DIAS_LONGO[agora.getDay()]}, ${String(agora.getHours()).padStart(2,"0")}:${String(agora.getMinutes()).padStart(2,"0")}).</div>
+</section>
+
+<div id="listaAgenda" class="two-col" style="grid-template-columns:1fr; gap:16px; margin-bottom:18px;"></div>
+
+<section class="card-dark">
+<h3 style="margin:0 0 4px; font-size:16px;">Comportamento fora do horário</h3>
+<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">O que as telas mostram quando nenhuma janela estiver ativa.</div>
+<label class="lbl" for="selForaHorario">Quando nenhuma janela estiver ativa</label>
+<select class="inp" id="selForaHorario">
+<option value="espera">Tela de espera (relógio + nome da tela)</option>
+<option value="loop">Continuar em loop</option>
+<option value="preto">Tela preta</option>
+</select>
+<div class="helper">Salvo automaticamente nas configurações.</div>
+</section>`;
+
+const lista = root.querySelector("#listaAgenda");
+estado.playlists.forEach(pl => {
+const card = document.createElement("div");
+card.className = "card-dark";
+const ativaAgora = playlistAtivaAgora(pl, agora);
+card.innerHTML = `
+<div class="nowrap-row" style="justify-content:space-between; margin-bottom:8px;">
+<div style="font-weight:600; font-size:15px;">${escHtml(pl.nome)}</div>
+<span class="badge ${ativaAgora ? "badge-on" : "badge-off"}">${ativaAgora ? "Em janela agora" : "Fora da janela"}</span>
+</div>
+<div class="helper" style="margin-bottom:8px;">Janelas cadastradas</div>
+<div class="stack-items" data-janelas></div>
+<div style="margin-top:14px; padding-top:12px; border-top:1px solid #262a35;">
+<div class="helper" style="margin-bottom:8px;">Nova janela</div>
+<div class="nowrap-row" data-dias style="margin-bottom:10px;">
+${DIAS.map((d, i) => `<label class="nowrap-row" style="font-size:13px; background:#0d0f14; border:1px solid #343a4b; padding:5px 10px; border-radius:999px; cursor:pointer;"><input type="checkbox" value="${i}" ${rascunhoJanela.dias.includes(i) ? "checked" : ""}> ${d}</label>`).join("")}
+</div>
+<div class="nowrap-row">
+<div><label class="lbl">Início</label><input type="time" class="inp" value="${rascunhoJanela.inicio}" data-ini></div>
+<div><label class="lbl">Fim</label><input type="time" class="inp" value="${rascunhoJanela.fim}" data-fim></div>
+<button class="btn-gold" data-addj style="align-self:flex-end;">Adicionar janela</button>
+</div>
+</div>`;
+
+const jEl = card.querySelector("[data-janelas]");
+if (!pl.agendamento.length) jEl.innerHTML = `<div class="muted-dark" style="font-size:13px;">Sem janelas. A playlist ficará em exibição contínua.</div>`;
+pl.agendamento.forEach((j, idx) => {
+const row = document.createElement("div");
+row.className = "row-line";
+row.innerHTML = `<span class="nm">${escHtml(descreveDias(j.dias))} · ${j.inicio}–${j.fim}</span><button class="btn-danger" data-rmj>Remover</button>`;
+row.querySelector("[data-rmj]").addEventListener("click", () => {
+pl.agendamento.splice(idx, 1); salvarEstado(estado); renderPainel();
+toast("Janela removida.");
+});
+jEl.appendChild(row);
+});
+
+card.querySelectorAll("[data-dias] input").forEach(cb => cb.addEventListener("change", () => {
+const dias = [...card.querySelectorAll("[data-dias] input:checked")].map(x => Number(x.value));
+rascunhoJanela.dias = dias;
+}));
+card.querySelector("[data-ini]").addEventListener("change", e => rascunhoJanela.inicio = e.target.value);
+card.querySelector("[data-fim]").addEventListener("change", e => rascunhoJanela.fim = e.target.value);
+
+card.querySelector("[data-addj]").addEventListener("click", () => {
+const ini = card.querySelector("[data-ini]").value, fim = card.querySelector("[data-fim]").value;
+const dias = [...card.querySelectorAll("[data-dias] input:checked")].map(x => Number(x.value));
+if (!dias.length) { toast("Selecione pelo menos um dia.", { type: "error" }); return; }
+if (!ini || !fim) { toast("Informe início e fim.", { type: "error" }); return; }
+if (ini === fim) { toast("Início e fim não podem ser iguais.", { type: "error" }); return; }
+pl.agendamento.push({ dias, inicio: ini, fim });
+salvarEstado(estado); renderPainel();
+toast("Janela adicionada à programação.", { type: "success" });
+});
+lista.appendChild(card);
+});
+
+const sel = root.querySelector("#selForaHorario");
+sel.value = estado.config.foraHorario || "espera";
+sel.addEventListener("change", e => {
+estado.config.foraHorario = e.target.value;
+salvarEstado(estado);
+toast("Comportamento fora do horário salvo.", { type: "success" });
+});
+}
+
+function resumoAgora(date) {
+const telasAtivas = estado.telas.filter(t => t.ativa);
+if (!telasAtivas.length) return "Nenhuma tela ativa no momento.";
+const partes = telasAtivas.map(t => {
+const pl = estado.playlists.find(p => p.id === t.playlistId);
+if (!pl) return `${t.nome} sem playlist`;
+const rodando = playlistAtivaAgora(pl, date);
+if (rodando) return `Agora: ${pl.nome} rodando em ${t.nome}`;
+return `${t.nome}: fora do horário (${estado.config.foraHorario === "preto" ? "tela preta" : estado.config.foraHorario === "loop" ? "em loop" : "tela de espera"})`;
+});
+return partes.join(" · ");
+}
+
+/* ---------- ABA PUBLICAR ---------- */
+let cacheJsonCopia = "";
+
+function renderPublicar(root) {
+const ultimo = estado.ultimoExport ? new Date(estado.ultimoExport).toLocaleString("pt-BR") : "Nunca exportado";
+const nVer = estado.videos.filter(v => v.status === "ok").length;
+const nProb = estado.videos.filter(v => v.status === "aviso" || v.status === "erro").length;
+const nNao = estado.videos.filter(v => !v.status || v.status === "nao_testado").length;
+root.innerHTML = `
+<section class="card-dark" style="margin-bottom:18px;">
+<h3 style="margin:0 0 8px; font-size:16px;">Saúde da programação</h3>
+<div class="health-bar" style="margin-bottom:10px;">
+<span class="st-badge st-ok">${nVer} verificados</span>
+<span class="st-badge st-aviso">${nProb} com problema</span>
+<span class="st-badge st-nao">${nNao} não testados</span>
+</div>
+<button class="btn-gold" id="btnTestarTodosPub">Testar todos os vídeos</button>
+<div class="helper" style="margin-top:10px;">Teste os links no endereço publicado, em uma aba anônima do navegador do computador. Pré-visualizações dentro de painéis podem bloquear vídeos externos, e o resultado ali não representa o que a TV vai fazer.</div>
+</section>
+
+<section class="card-dark" style="margin-bottom:18px;">
+<div class="nowrap-row" style="justify-content:space-between;">
+<div>
+<h2 class="section-title">Publicar nas TVs</h2>
+<div class="muted-dark" style="font-size:13px;">Envie a programação para todas as TVs sem depender deste aparelho.</div>
+</div>
+<span class="badge badge-local">Último export: ${escHtml(ultimo)}</span>
+</div>
+</section>
+
+<section class="card-dark" style="margin-bottom:18px;">
+<h3 style="margin:0 0 12px; font-size:16px;">Fluxo remoto em 3 passos</h3>
+<div class="two-col" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+<div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">1</span><div class="nm"><strong>Baixe</strong> o arquivo de configuração (.json) com o botão abaixo.</div></div>
+<div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">2</span><div class="nm"><strong>Hospede</strong> o JSON em um endereço público: Google Drive com link direto, GitHub Gist raw ou qualquer hospedagem.</div></div>
+<div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">3</span><div class="nm"><strong>Abra</strong> na TV o link do player com <code>?config=ENDERECO_DO_JSON</code>.</div></div>
+</div>
+<div class="helper" style="margin-top:12px;">Aviso: vídeos enviados do aparelho não sincronizam entre TVs. Para operação remota, use links de vídeo e o JSON de configuração.</div>
+</section>
+
+<section class="two-col" style="margin-bottom:18px;">
+<div class="card-dark">
+<h3 style="margin:0 0 4px; font-size:16px;">Exportar</h3>
+<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">Gere o arquivo ou copie o texto para colar em um Gist.</div>
+<div class="nowrap-row">
+<button class="btn-gold" id="btnExportar">Exportar configuração (.json)</button>
+<button class="btn-ghost" id="btnCopiarJson">Copiar configuração como texto</button>
+</div>
+<pre class="json-box" id="previewJson" style="margin-top:12px;">${escHtml(JSON.stringify(exportarObjeto(), null, 2).slice(0, 900))}…</pre>
+</div>
+
+<div class="card-dark">
+<h3 style="margin:0 0 4px; font-size:16px;">Importar configuração</h3>
+<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">Cole o JSON exportado. Ele substituirá a programação atual.</div>
+<textarea class="inp" id="txtImport" rows="6" placeholder='{ "videos": [...], "playlists": [...], "telas": [...] }'></textarea>
+<div class="nowrap-row" style="margin-top:10px;">
+<button class="btn-gold" id="btnImportar">Importar configuração</button>
+</div>
+</div>
+</section>
+
+<section class="card-dark">
+<h3 style="margin:0 0 4px; font-size:16px;">Gerar link do player com configuração remota</h3>
+<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">Informe o endereço público do JSON e escolha a tela. O link final fica pronto para abrir na TV.</div>
+<div class="two-col">
+<div>
+<label class="lbl" for="inpJsonUrl">URL pública do JSON</label>
+<input class="inp" id="inpJsonUrl" placeholder="https://gist.githubusercontent.com/.../config.json">
+<div class="helper">Precisa ser acessível sem login.</div>
+</div>
+<div>
+<label class="lbl" for="selTelaLink">Tela</label>
+<select class="inp" id="selTelaLink">
+${estado.telas.map(t => `<option value="${t.id}">${escHtml(t.nome)}</option>`).join("")}
+</select>
+</div>
+</div>
+<div class="nowrap-row" style="margin-top:12px;">
+<button class="btn-gold" id="btnGerarLink">Montar e copiar link final</button>
+</div>
+<div class="muted-dark" id="linkFinal" style="font-size:12px; word-break:break-all; margin-top:12px;"></div>
+</section>`;
+
+root.querySelector("#btnTestarTodosPub").addEventListener("click", () => {
+setAba("videos");
+setTimeout(() => testarTodosVideos(painel), 50);
+});
+
+root.querySelector("#btnExportar").addEventListener("click", () => {
+const blob = new Blob([JSON.stringify(exportarObjeto(), null, 2)], { type: "application/json" });
+const a = document.createElement("a");
+a.href = URL.createObjectURL(blob);
+a.download = "configuracao-telas.json";
+a.click();
+setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+estado.ultimoExport = new Date().toISOString();
+salvarEstado(estado);
+toast("Arquivo de configuração exportado.", { type: "success" });
+});
+
+root.querySelector("#btnCopiarJson").addEventListener("click", () => {
+copiarTexto(JSON.stringify(exportarObjeto(), null, 2), "Configuração copiada como texto.");
+});
+
+root.querySelector("#btnImportar").addEventListener("click", () => {
+const txt = root.querySelector("#txtImport").value.trim();
+if (!txt) { toast("Cole o conteúdo JSON antes de importar.", { type: "error" }); return; }
+try {
+const d = JSON.parse(txt);
+if (!Array.isArray(d.videos) || !Array.isArray(d.playlists) || !Array.isArray(d.telas)) throw new Error("estrutura");
+d.config = d.config || { intervaloRefreshMin: 5, telaPadrao: null, corDestaque: "#d4a24c", foraHorario: "espera" };
+estado = d; salvarEstado(estado); renderPainel();
+toast("Configuração importada com sucesso.", { type: "success" });
+} catch (e) {
+toast("JSON inválido. Verifique o conteúdo colado.", { type: "error" });
+}
+});
+
+root.querySelector("#btnGerarLink").addEventListener("click", () => {
+const url = root.querySelector("#inpJsonUrl").value.trim();
+const telaId = root.querySelector("#selTelaLink").value;
+if (!urlValida(url)) { toast("Informe uma URL pública válida do JSON.", { type: "error" }); return; }
+const base = location.origin + location.pathname;
+const link = base + "?config=" + encodeURIComponent(url) + "#/tela/" + telaId;
+root.querySelector("#linkFinal").textContent = link;
+copiarTexto(link, "Link final do player copiado.");
+});
+}
+
+/* ---------- MODAL DE CONFIRMAÇÃO ---------- */
+let acaoConfirmar = null;
+function confirmar(titulo, texto, fn) {
+document.getElementById("dlgConfirmTitle").textContent = titulo;
+document.getElementById("dlgConfirmText").textContent = texto;
+acaoConfirmar = fn;
+document.getElementById("dlgConfirm").showModal();
+}
+document.getElementById("btnConfirmNo").addEventListener("click", () => document.getElementById("dlgConfirm").close());
+document.getElementById("btnConfirmYes").addEventListener("click", () => {
+document.getElementById("dlgConfirm").close();
+if (acaoConfirmar) acaoConfirmar();
+acaoConfirmar = null;
+});
+
+/* ---------- CABEÇALHO / EVENTOS ---------- */
+document.querySelectorAll(".pill").forEach(b => b.addEventListener("click", () => setAba(b.dataset.tab)));
+document.getElementById("btnResetDemo").addEventListener("click", () => {
+confirmar("Restaurar exemplos", "A programação atual será substituída pelos dados de exemplo.", () => {
+estado = dadosIniciais();
+estado.config.telaPadrao = estado.telas[0].id;
+salvarEstado(estado); renderPainel();
+toast("Exemplos restaurados.", { type: "success" });
+});
+});
+
+/* Atualiza o resumo "agora" a cada 30s sem recarregar */
+setInterval(() => { if (abaAtiva === "agenda" && document.getElementById("resumoAgora")) renderPainel(); }, 30000);
+
+/* =========================================================
+   4. MODO PLAYER (#/tela/{id})
+   ========================================================= */
+const telaRoot = document.createElement("div");
+telaRoot.id = "player";
+telaRoot.style.cssText = "position:fixed; inset:0; background:#000; color:#f4f1ea; display:none; z-index:999; font-family:system-ui, Inter, sans-serif; overflow:hidden;";
+document.body.appendChild(telaRoot);
+
+const params = new URLSearchParams(location.search);
+const configRemotaUrl = params.get("config");
+
+let playerTimers = { agenda: null, relogio: null, cursor: null, refresh: null, falha: null, contador: null };
+let playerEstado = { telaId: null, playlist: null, videos: [], indice: 0, modo: "idle", iniciado: false, falhas: 0 };
+let dadosPlayer = null;
+
+function getAtivosRemoto() {
+const cache = localStorage.getItem(CACHE_REMOTO_KEY);
+return cache ? JSON.parse(cache) : null;
+}
+
+async function carregarConfigRemota() {
+if (!configRemotaUrl) return null;
+try {
+const r = await fetch(configRemotaUrl, { cache: "no-store" });
+if (!r.ok) throw new Error("http");
+const j = await r.json();
+if (!Array.isArray(j.videos) || !Array.isArray(j.playlists) || !Array.isArray(j.telas)) throw new Error("schema");
+localStorage.setItem(CACHE_REMOTO_KEY, JSON.stringify(j));
+return j;
+} catch (e) {
+return getAtivosRemoto();
+}
+}
+
+async function obterDadosPlayer() {
+if (configRemotaUrl) {
+const remoto = await carregarConfigRemota();
+if (remoto) return remoto;
+}
+return estado;
+}
+
+function ativarRefreshRemoto() {
+if (!configRemotaUrl) return;
+const min = Number(estado.config.intervaloRefreshMin) || 5;
+clearInterval(playerTimers.refresh);
+playerTimers.refresh = setInterval(async () => {
+const novo = await carregarConfigRemota();
+if (novo) { dadosPlayer = novo; atualizarProgramacao(); }
+}, min * 60 * 1000);
+}
+
+async function rotaPlayer(telaId) {
+dadosPlayer = await obterDadosPlayer();
+const app = document.getElementById("app");
+if (app) app.style.display = "none";
+telaRoot.style.display = "block";
+playerEstado.telaId = telaId;
+
+const tela = dadosPlayer.telas.find(t => t.id === telaId);
+if (!tela) {
+telaRoot.innerHTML = `
+<div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; gap:12px;">
+<div style="font-size:14px; letter-spacing:.2em; color:#d4a24c;">CENTRAL DE TELAS</div>
+<div style="font-size:clamp(24px,4vw,44px); font-weight:700;">Tela não encontrada</div>
+<div style="color:#9aa1b2; max-width:560px;">Este identificador não está cadastrado. Cadastre a tela no painel de controle e copie o link gerado.</div>
+<a href="#/controle" style="color:#e8b96a; margin-top:12px;">Ir para o painel de controle</a>
+</div>`;
+return;
+}
+
+telaRoot.innerHTML = `
+<video id="pv" playsinline preload="auto" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; display:none;"></video>
+<div id="pErro" class="erro-player" style="display:none;"></div>
+<div id="pEspera" style="position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:radial-gradient(circle at 50% 40%, #1b1710, #000 70%);">
+<div id="pRelogio" style="font-size:clamp(64px,16vw,200px); font-weight:300; font-variant-numeric:tabular-nums; letter-spacing:.02em;">--:--</div>
+<div id="pNomeEspera" style="font-size:clamp(18px,3vw,34px); color:#e8b96a; margin-top:8px;"></div>
+<div style="margin-top:28px; font-size:14px; letter-spacing:.3em; color:#8b8373;">CENTRAL DE TELAS</div>
+<div id="pMsgEspera" style="color:#9aa1b2; font-size:16px; margin-top:6px;"></div>
+</div>
+<div id="pPreto" style="position:absolute; inset:0; background:#000; display:none;"></div>
+<div id="pOverlay" style="position:absolute; inset:0; background:linear-gradient(160deg,#120f0a,#000); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; z-index:5;">
+<div style="font-size:13px; letter-spacing:.3em; color:#d4a24c;">SHOPPING</div>
+<div id="pOvNome" style="font-size:clamp(28px,5vw,58px); font-weight:700; margin:10px 0;"></div>
+<div id="pOvLocal" style="color:#9aa1b2; font-size:18px;"></div>
+<button id="pBtnIniciar" style="margin-top:36px; background:#d4a24c; color:#14110a; border:none; border-radius:14px; padding:22px 48px; font-size:clamp(20px,3vw,30px); font-weight:700; cursor:pointer;">Iniciar exibição</button>
+<div style="color:#6f7587; font-size:12px; margin-top:16px;">Enter ou toque para iniciar · F para tela cheia</div>
+</div>
+<div id="pInfo" style="position:absolute; top:12px; left:14px; z-index:6; display:none; font-size:13px; color:#e8e1d2; background:rgba(0,0,0,.55); padding:6px 12px; border-radius:999px; align-items:center; gap:10px;">
+<span id="pNomeTela"></span><span style="color:#6f7587;">·</span><span id="pHora" style="font-variant-numeric:tabular-nums;"></span>
+<span style="display:inline-flex; align-items:center; gap:6px; color:#fca5a5;"><span class="live-dot" style="margin:0;"></span>AO VIVO</span>
+</div>`;
+
+const pv = document.getElementById("pv");
+pv.addEventListener("ended", proximoVideo);
+pv.addEventListener("error", () => {
+const atual = playerEstado.videos[playerEstado.indice % (playerEstado.videos.length || 1)];
+falhaVideo("erro-media", atual);
+});
+document.getElementById("pBtnIniciar").addEventListener("click", iniciarExibicao);
+
+document.getElementById("pNomeTela").textContent = tela.nome;
+document.getElementById("pOvNome").textContent = tela.nome;
+document.getElementById("pOvLocal").textContent = tela.local || "";
+
+atualizarProgramacao(true);
+iniciarRelogio();
+iniciarCursor();
+clearInterval(playerTimers.agenda);
+playerTimers.agenda = setInterval(atualizarProgramacao, 30000);
+ativarRefreshRemoto();
+}
+
+function iniciarCursor() {
+const ocultar = () => { telaRoot.style.cursor = "none"; };
+const mostrar = () => {
+telaRoot.style.cursor = "default";
+clearTimeout(playerTimers.cursor);
+playerTimers.cursor = setTimeout(ocultar, 3000);
+};
+telaRoot.onmousemove = mostrar;
+telaRoot.onclick = mostrar;
+mostrar();
+}
+
+function iniciarRelogio() {
+const tick = () => {
+const d = new Date();
+const h = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+const hora = document.getElementById("pHora");
+const rel = document.getElementById("pRelogio");
+if (hora) hora.textContent = h + ":" + String(d.getSeconds()).padStart(2, "0");
+if (rel) rel.textContent = h;
+};
+tick();
+clearInterval(playerTimers.relogio);
+playerTimers.relogio = setInterval(tick, 1000);
+}
+
+function telaAtual() {
+return dadosPlayer.telas.find(t => t.id === playerEstado.telaId);
+}
+
+function atualizarProgramacao(primeira) {
+const tela = telaAtual();
+if (!tela) return;
+const pl = dadosPlayer.playlists.find(p => p.id === tela.playlistId);
+const agora = new Date();
+const janelaOk = pl && playlistAtivaAgora(pl, agora) && (pl.agendamento && pl.agendamento.length > 0 ? true : true);
+const emJanela = pl && (pl.agendamento.length === 0 || janelaOk);
+
+if (!tela.ativa) { mostrarModo("preto"); return; }
+
+if (emJanela) {
+const videos = pl.itens.map(id => dadosPlayer.videos.find(v => v.id === id)).filter(v => v && v.ativo && v.src);
+if (!videos.length) { mostrarModo("espera-vazio"); return; }
+const mudouPlaylist = !playerEstado.playlist || playerEstado.playlist !== pl.id;
+playerEstado.playlist = pl.id;
+playerEstado.videos = videos;
+if (mudouPlaylist || primeira) playerEstado.indice = 0;
+if (!playerEstado.iniciado && !primeira) return;
+if (playerEstado.modo !== "video") { mostrarModo("video"); tocarAtual(); }
+} else {
+playerEstado.playlist = null;
+const fora = dadosPlayer.config && dadosPlayer.config.foraHorario || "espera";
+if (fora === "loop" && pl && pl.itens.length) {
+const videos = pl.itens.map(id => dadosPlayer.videos.find(v => v.id === id)).filter(v => v && v.ativo && v.src);
+if (videos.length) {
+playerEstado.videos = videos;
+if (playerEstado.modo !== "video") { mostrarModo("video"); tocarAtual(); }
+return;
+}
+}
+mostrarModo(fora === "preto" ? "preto" : "espera");
+}
+}
+
+function mostrarModo(modo) {
+const pv = document.getElementById("pv");
+const espera = document.getElementById("pEspera");
+const preto = document.getElementById("pPreto");
+const info = document.getElementById("pInfo");
+if (!pv) return;
+playerEstado.modo = modo;
+pv.style.display = modo === "video" ? "block" : "none";
+espera.style.display = (modo === "espera" || modo === "espera-vazio") ? "flex" : "none";
+preto.style.display = modo === "preto" ? "block" : "none";
+info.style.display = playerEstado.iniciado ? "flex" : "none";
+if (modo === "espera-vazio") {
+document.getElementById("pMsgEspera").textContent = "Nenhum vídeo na programação";
+document.getElementById("pNomeEspera").textContent = telaAtual() ? telaAtual().nome : "";
+} else if (modo === "espera") {
+document.getElementById("pMsgEspera").textContent = "Programação em breve";
+document.getElementById("pNomeEspera").textContent = telaAtual() ? telaAtual().nome : "";
+}
+if (modo === "video" && !pv.paused === false) { /* ok */ }
+if (modo !== "video") { pv.pause(); }
+}
+
+function tocarAtual() {
+const pv = document.getElementById("pv");
+if (!playerEstado.videos.length) { mostrarModo("espera-vazio"); return; }
+const v = playerEstado.videos[playerEstado.indice % playerEstado.videos.length];
+const src = v.src;
+document.getElementById("pErro").style.display = "none";
+if (ehYoutube(src)) {
+falhaVideo("youtube", v, "Link do YouTube não toca direto no player.", "Use um arquivo MP4 ou o link direto de um vídeo hospedado.");
+return;
+}
+pv.src = src;
+pv.muted = false;
+pv.play().then(() => { playerEstado.falhas = 0; }).catch(() => { /* aguarda toque */ });
+}
+
+function proximoVideo() {
+if (!playerEstado.videos.length) return;
+playerEstado.indice = (playerEstado.indice + 1) % playerEstado.videos.length;
+tocarAtual();
+}
+
+function falhaVideo(motivo, video, msgErro, acaoErro) {
+clearTimeout(playerTimers.falha);
+playerEstado.falhas++;
+try { console.warn("[Central de Telas] falha de reprodução registrada", motivo || ""); } catch (e) {}
+const pv = document.getElementById("pv");
+const cod = pv && pv.error ? pv.error.code : null;
+const msg = msgErro || (cod ? ERROS_MEDIA[cod] : "Falha desconhecida ao reproduzir.");
+const acao = acaoErro || (cod ? ACOES_MEDIA[cod] : "Verifique a URL do vídeo.");
+const nome = video ? video.nome : "";
+const url = video ? video.src : "";
+if (video) {
+video.status = "erro"; video.motivo = msg; salvarEstado(estado);
+}
+const box = document.getElementById("pErro");
+if (box) {
+box.innerHTML = `<h2>Não foi possível exibir este vídeo</h2>
+<div style="font-size:clamp(18px,2.4vw,26px); color:#fff;">${escHtml(nome)}</div>
+<div class="url">${escHtml(url)}</div>
+<div class="motivo">${escHtml(msg)}</div>
+<div class="acao">${escHtml(acao)}</div>
+<div style="color:#e8b96a; font-size:18px;" id="pContador">Próximo vídeo em 5 segundos…</div>`;
+box.style.display = "flex";
+let seg = 5;
+clearInterval(playerTimers.contador);
+playerTimers.contador = setInterval(() => {
+seg--;
+const c = document.getElementById("pContador");
+if (c) c.textContent = seg > 0 ? "Próximo vídeo em " + seg + " segundos…" : "Pulando…";
+if (seg <= 0) clearInterval(playerTimers.contador);
+}, 1000);
+}
+playerTimers.falha = setTimeout(() => { clearInterval(playerTimers.contador); proximoVideo(); }, 5000);
+}
+
+function iniciarExibicao() {
+playerEstado.iniciado = true;
+const ov = document.getElementById("pOverlay");
+ov.style.display = "none";
+document.getElementById("pInfo").style.display = "flex";
+const el = document.documentElement;
+if (el.requestFullscreen) el.requestFullscreen().catch(() => {});
+atualizarProgramacao(true);
+const pv = document.getElementById("pv");
+if (playerEstado.modo === "video" && pv.src) pv.play().catch(() => {});
+}
+
+function alternarPlay() {
+const pv = document.getElementById("pv");
+if (!pv) return;
+if (!playerEstado.iniciado) { iniciarExibicao(); return; }
+if (playerEstado.modo !== "video") return;
+pv.paused ? pv.play().catch(() => {}) : pv.pause();
+}
+
+function alternarFullscreen() {
+if (!document.fullscreenElement) document.documentElement.requestFullscreen && document.documentElement.requestFullscreen().catch(() => {});
+else document.exitFullscreen && document.exitFullscreen();
+}
+
+document.addEventListener("keydown", e => {
+if (!telaRoot || telaRoot.style.display !== "block") return;
+if (e.key === "Enter" || e.key === " ") { e.preventDefault(); alternarPlay(); }
+else if (e.key === "ArrowRight") { e.preventDefault(); if (playerEstado.iniciado && playerEstado.modo === "video") proximoVideo(); }
+else if (e.key === "f" || e.key === "F") { alternarFullscreen(); }
+});
+
+/* =========================================================
+   5. ROTEADOR (hash)
+   ========================================================= */
+const app = document.createElement("div");
+app.id = "app";
+app.style.display = "contents";
+const header = document.querySelector(".app-header");
+const footer = document.getElementById("footerPainel");
+const fragPainel = [header, painel, footer, document.getElementById("dlgPreview"), document.getElementById("dlgConfirm")];
+
+function mostrarPainel() {
+telaRoot.style.display = "none";
+clearInterval(playerTimers.agenda);
+clearInterval(playerTimers.relogio);
+clearInterval(playerTimers.refresh);
+const pv = document.getElementById("pv");
+if (pv) { pv.pause(); }
+telaRoot.innerHTML = "";
+fragPainel.forEach(el => el && (el.style.display = ""));
+renderPainel();
+}
+
+function ocultarPainel() {
+fragPainel.forEach(el => el && (el.style.display = "none"));
+}
+
+function rotear() {
+const h = location.hash || "";
+const m = h.match(/^#\/tela\/([^/]+)$/);
+if (m) {
+ocultarPainel();
+rotaPlayer(decodeURIComponent(m[1]));
+} else {
+if (!h || h === "#" || h.startsWith("#/controle") || true) {
+if (h !== "#/controle" && !h.startsWith("#/controle")) location.hash = "#/controle";
+}
+mostrarPainel();
+}
+}
+
+window.addEventListener("hashchange", rotear);
+document.addEventListener("DOMContentLoaded", () => {
+if (!location.hash || !location.hash.startsWith("#/")) {
+location.hash = "#/controle";
+}
+rotear();
+});
+if (document.readyState !== "loading") {
+if (!location.hash || !location.hash.startsWith("#/")) location.hash = "#/controle";
+rotear();
+}
+</script>
+
+</body>
+</html>
