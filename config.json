@@ -1,0 +1,116 @@
+{
+  "videos": [
+    {
+      "id": "vid_1z9tix6",
+      "nome": "Big Buck Bunny (amostra)",
+      "tipo": "url",
+      "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+      "duracaoEstimada": 596,
+      "ativo": true,
+      "status": "erro",
+      "motivo": "O endereço não entrega um vídeo que o navegador reconheça. Causas mais comuns: link de visualização em vez de arquivo, compartilhamento restrito, arquivo acima de 100 MB no Drive, ou formato incompatível (MOV/HEVC).",
+      "testadoEm": "2026-11-23T12:40:28.672Z"
+    },
+    {
+      "id": "vid_gtqqxve",
+      "nome": "For Bigger Joyrides (amostra)",
+      "tipo": "url",
+      "src": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+      "duracaoEstimada": 15,
+      "ativo": true,
+      "status": "erro",
+      "motivo": "O endereço não entrega um vídeo que o navegador reconheça. Causas mais comuns: link de visualização em vez de arquivo, compartilhamento restrito, arquivo acima de 100 MB no Drive, ou formato incompatível (MOV/HEVC).",
+      "testadoEm": "2026-11-23T12:40:27.089Z"
+    },
+    {
+      "id": "vid_u8waxex",
+      "nome": "verao",
+      "tipo": "url",
+      "src": "https://cdn.imgpile.com/f/FFsmyP4.mp4",
+      "duracaoEstimada": 40,
+      "ativo": true,
+      "status": "ok",
+      "motivo": "",
+      "testadoEm": "2026-11-23T14:01:53.821Z"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "pl_r5159cy",
+      "nome": "Vitrine Principal",
+      "itens": [
+        "vid_1z9tix6",
+        "vid_gtqqxve"
+      ],
+      "agendamento": [
+        {
+          "dias": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "inicio": "10:00",
+          "fim": "22:00"
+        },
+        {
+          "dias": [
+            0,
+            6
+          ],
+          "inicio": "12:00",
+          "fim": "21:00"
+        }
+      ],
+      "loop": true
+    },
+    {
+      "id": "pl_qdvewo3",
+      "nome": "Promoções",
+      "itens": [
+        "vid_gtqqxve"
+      ],
+      "agendamento": [
+        {
+          "dias": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "inicio": "09:00",
+          "fim": "13:00"
+        }
+      ],
+      "loop": true
+    },
+    {
+      "id": "pl_hku9ync",
+      "nome": "Teste",
+      "itens": [
+        "vid_u8waxex"
+      ],
+      "agendamento": [],
+      "loop": true
+    }
+  ],
+  "telas": [
+    {
+      "id": "tela_0qc2zai",
+      "nome": "TV Matriz",
+      "local": "Matriz",
+      "playlistId": "pl_hku9ync",
+      "ativa": true
+    }
+  ],
+  "config": {
+    "intervaloRefreshMin": 5,
+    "telaPadrao": "tela_0qc2zai",
+    "corDestaque": "#d4a24c",
+    "foraHorario": "espera"
+  },
+  "ultimoExport": "2026-11-23T14:18:08.047Z"
+}
