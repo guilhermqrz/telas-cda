@@ -1,0 +1,106 @@
+{
+  "videos": [
+    {
+      "id": "vid_kb3ve9q",
+      "nome": "adidas teste",
+      "tipo": "url",
+      "src": "https://cdn.imgpile.com/f/FFsmyP4.mp4",
+      "duracaoEstimada": 40,
+      "ativo": true,
+      "status": "erro",
+      "motivo": "O endereço não entrega um vídeo que o navegador reconheça. Causas mais comuns: link de visualização em vez de arquivo, compartilhamento restrito, arquivo acima de 100 MB no Drive, ou formato incompatível (MOV/HEVC).",
+      "testadoEm": "2026-11-23T14:44:21.013Z"
+    },
+    {
+      "id": "vid_io94g4h",
+      "nome": "NFL Teste",
+      "tipo": "url",
+      "src": "https://cdn.imgpile.com/f/5Nkb33y.mp4",
+      "duracaoEstimada": null,
+      "ativo": true,
+      "status": "erro",
+      "motivo": "O endereço não entrega um vídeo que o navegador reconheça. Causas mais comuns: link de visualização em vez de arquivo, compartilhamento restrito, arquivo acima de 100 MB no Drive, ou formato incompatível (MOV/HEVC).",
+      "testadoEm": "2026-11-23T19:07:56.904Z"
+    }
+  ],
+  "playlists": [
+    {
+      "id": "pl_ncwr9k8",
+      "nome": "Testes",
+      "itens": [
+        "vid_kb3ve9q",
+        "vid_io94g4h"
+      ],
+      "agendamento": [
+        {
+          "dias": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "inicio": "10:00",
+          "fim": "22:00"
+        },
+        {
+          "dias": [
+            0,
+            6
+          ],
+          "inicio": "12:00",
+          "fim": "21:00"
+        }
+      ],
+      "loop": true
+    },
+    {
+      "id": "pl_ghrnu8u",
+      "nome": "Promoções",
+      "itens": [],
+      "agendamento": [
+        {
+          "dias": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6
+          ],
+          "inicio": "09:00",
+          "fim": "13:00"
+        },
+        {
+          "dias": [
+            1,
+            2,
+            3,
+            4,
+            5
+          ],
+          "inicio": "10:00",
+          "fim": "22:00"
+        }
+      ],
+      "loop": true
+    }
+  ],
+  "telas": [
+    {
+      "id": "tela_ir5df7f",
+      "nome": "Matriz",
+      "local": "Matriz",
+      "playlistId": "pl_ncwr9k8",
+      "ativa": true
+    }
+  ],
+  "config": {
+    "intervaloRefreshMin": 5,
+    "telaPadrao": "tela_ir5df7f",
+    "corDestaque": "#d4a24c",
+    "foraHorario": "loop",
+    "modoSilencioso": true
+  },
+  "ultimoExport": "2026-11-23T20:54:44.438Z"
+}
