@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Central de Telas — Sinalização Digital para TVs</title>
+<title>Central de Telas — Casas da Água</title>
 <style>
 /* Skip artifact shell — fixed styles served beside every artifact.
    Tokens, utilities and components (basecoat 1.0 markup, no CDN); artifacts
@@ -1099,6 +1099,32 @@ pre.json-box { background:#0d0f14; border:1px solid #262a35; border-radius:10px;
 .erro-player .motivo { font-size:clamp(18px,2.6vw,28px); color:#fde68a; max-width:980px; }
 .erro-player .acao { font-size:clamp(16px,2.2vw,22px); color:#f4f1ea; max-width:980px; }
 .health-bar { display:flex; gap:12px; flex-wrap:wrap; }
+.diag-list { display:grid; gap:6px; margin:10px 0; }
+.diag-row { display:flex; justify-content:space-between; gap:12px; font-size:13px; border-bottom:1px solid #1f232e; padding:6px 0; flex-wrap:wrap; }
+.diag-row span:first-child { color:#9aa1b2; }
+.diag-msg { font-size:13px; padding:8px 10px; border-radius:8px; margin-top:6px; }
+.diag-msg.warn { background:rgba(234,179,8,.10); color:#fde68a; border:1px solid rgba(234,179,8,.35); }
+.diag-msg.err { background:rgba(239,68,68,.10); color:#fca5a5; border:1px solid rgba(239,68,68,.35); }
+.som-btn { position:absolute; right:12px; bottom:12px; z-index:7; background:rgba(0,0,0,.6); color:#e8b96a; border:1px solid #3a4052; border-radius:999px; width:38px; height:38px; cursor:pointer; font-size:16px; }
+.som-btn:focus-visible { outline:2px solid #d4a24c; outline-offset:2px; }
+.switch-row { display:flex; align-items:center; gap:10px; font-size:14px; }
+.switch-row input { width:18px; height:18px; accent-color:#d4a24c; }
+.preview-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.resultado-linha { font-size:14px; margin-top:4px; }
+=======
+.health-bar { display:flex; gap:12px; flex-wrap:wrap; }
+.diag-list { display:grid; gap:6px; margin:10px 0; }
+.diag-row { display:flex; justify-content:space-between; gap:12px; font-size:13px; border-bottom:1px solid #1f232e; padding:6px 0; flex-wrap:wrap; }
+.diag-row span:first-child { color:#9aa1b2; }
+.diag-msg { font-size:13px; padding:8px 10px; border-radius:8px; margin-top:6px; }
+.diag-msg.warn { background:rgba(234,179,8,.10); color:#fde68a; border:1px solid rgba(234,179,8,.35); }
+.diag-msg.err { background:rgba(239,68,68,.10); color:#fca5a5; border:1px solid rgba(239,68,68,.35); }
+.som-btn { position:absolute; right:12px; bottom:12px; z-index:7; background:rgba(0,0,0,.6); color:#e8b96a; border:1px solid #3a4052; border-radius:999px; width:38px; height:38px; cursor:pointer; font-size:16px; }
+.som-btn:focus-visible { outline:2px solid #d4a24c; outline-offset:2px; }
+.switch-row { display:flex; align-items:center; gap:10px; font-size:14px; }
+.switch-row input { width:18px; height:18px; accent-color:#d4a24c; }
+.preview-row { display:flex; align-items:center; gap:10px; margin-top:10px; flex-wrap:wrap; }
+.resultado-linha { font-size:14px; margin-top:4px; }
 @media print {
 .app-header, .footer-line, button, .no-print { display:none !important; }
 html, body { background:#fff; color:#000; }
@@ -1112,8 +1138,8 @@ html, body { background:#fff; color:#000; }
 <div class="nowrap-row" style="justify-content:space-between;">
 <div>
 <span class="eyebrow-pill">Sinalização digital</span>
-<h1 style="font-size:22px; margin:8px 0 2px;">Central de Telas</h1>
-<div class="muted-dark" style="font-size:13px;">Gerencie vídeos, playlists, telas e a programação das TVs do shopping.</div>
+<h1 style="font-size:22px; margin:8px 0 2px;">Central de Telas — Casas da Água</h1>
+<div class="muted-dark" style="font-size:13px;">Gerencie vídeos, playlists, telas e a programação das TVs da Casas da Água.</div>
 </div>
 <div class="nowrap-row">
 <span class="badge badge-on" id="badgeTelasAtivas">3 telas ativas</span>
@@ -1132,7 +1158,7 @@ html, body { background:#fff; color:#000; }
 
 <main class="wrap" id="painel" style="flex:1;"></main>
 
-<div class="footer-line" id="footerPainel">Central de Telas — sinalização digital para TVs</div>
+<div class="footer-line" id="footerPainel">Central de Telas — Casas da Água</div>
 
 <dialog class="dlg" id="dlgPreview">
 <div class="dlg-inner">
@@ -1141,7 +1167,10 @@ html, body { background:#fff; color:#000; }
 <button class="btn-ghost" id="btnClosePreview">Fechar</button>
 </div>
 <div style="background:#000; border-radius:10px; overflow:hidden; aspect-ratio:16/9;">
-<video id="previewVideo" controls style="width:100%; height:100%; object-fit:contain; background:#000;"></video>
+<video id="previewVideo" controls playsinline style="width:100%; height:100%; object-fit:contain; background:#000;"></video>
+</div>
+<div class="preview-row">
+<button class="btn-ghost" id="btnSomPreview" type="button">🔈 Sem som</button>
 </div>
 <div class="helper" id="previewHint">Se o vídeo não carregar, verifique a URL ou o formato do arquivo.</div>
 </div>
@@ -1162,7 +1191,7 @@ html, body { background:#fff; color:#000; }
 /* =========================================================
    1. DADOS, PERSISTÊNCIA E UTILITÁRIOS
    ========================================================= */
-const STORE_KEY = "signage_v1";
+const STORE_KEY = "signage_casas_da_agua_v1";
 const DIAS = ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"];
 const DIAS_LONGO = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"];
 
@@ -1173,19 +1202,19 @@ const v1 = uid("vid"), v2 = uid("vid");
 const p1 = uid("pl"), p2 = uid("pl");
 return {
 videos: [
-{ id: v1, nome: "Big Buck Bunny (amostra)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", duracaoEstimada: 596, ativo: true },
-{ id: v2, nome: "For Bigger Joyrides (amostra)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", duracaoEstimada: 15, ativo: true }
+{ id: v1, nome: "Promoção Casas da Água — 30s (teste)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4", duracaoEstimada: 596, ativo: true, modoSilencioso: true },
+{ id: v2, nome: "Exemplo — Joyrides (teste)", tipo: "url", src: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4", duracaoEstimada: 15, ativo: true, modoSilencioso: true }
 ],
 playlists: [
 { id: p1, nome: "Vitrine Principal", itens: [v1, v2], agendamento: [ { dias: [1,2,3,4,5], inicio: "10:00", fim: "22:00" }, { dias: [0,6], inicio: "12:00", fim: "21:00" } ], loop: true },
 { id: p2, nome: "Promoções", itens: [v2], agendamento: [ { dias: [1,2,3,4,5,6], inicio: "09:00", fim: "13:00" } ], loop: true }
 ],
 telas: [
-{ id: uid("tela"), nome: "TV Entrada Principal", local: "Piso térreo", playlistId: p1, ativa: true },
-{ id: uid("tela"), nome: "TV Praça de Alimentação", local: "Piso L3", playlistId: p2, ativa: true },
-{ id: uid("tela"), nome: "TV Corredor L2", local: "Piso L2", playlistId: p1, ativa: false }
+{ id: uid("tela"), nome: "TV Recepção", local: "Entrada principal", playlistId: p1, ativa: true },
+{ id: uid("tela"), nome: "TV Corredor L1", local: "Corredor L1", playlistId: p2, ativa: true },
+{ id: uid("tela"), nome: "TV Salão Principal", local: "Salão de vendas", playlistId: p1, ativa: false }
 ],
-config: { intervaloRefreshMin: 5, telaPadrao: null, corDestaque: "#d4a24c", foraHorario: "espera" },
+config: { intervaloRefreshMin: 5, telaPadrao: null, corDestaque: "#d4a24c", foraHorario: "espera", modoSilencioso: true },
 ultimoExport: null
 };
 }
@@ -1330,7 +1359,7 @@ root.innerHTML = `
 <form id="formVideo" class="two-col" style="grid-template-columns:1fr;">
 <div>
 <label class="lbl" for="vNome">Nome</label>
-<input class="inp" id="vNome" placeholder="Ex.: Campanha Dia das Mães" maxlength="80" required>
+<input class="inp" id="vNome" placeholder="Ex.: Promoção Casas da Água — 30s" maxlength="80" required>
 <div class="helper">Nome que aparece nas playlists e no painel.</div>
 </div>
 <div>
@@ -1469,6 +1498,7 @@ return `<span class="st-badge ${m[0]}">${m[1]}</span>`;
 }
 
 /* ---------- DIAGNÓSTICO DE LINK ---------- */
+let ultimoErroTeste = null;
 const ERROS_MEDIA = {
 1: "O carregamento foi interrompido. Provavelmente o link expirou ou o acesso foi bloqueado.",
 2: "Falha de rede ao baixar o vídeo. Pode ser bloqueio de acesso, cota do Drive excedida ou link fora do ar.",
@@ -1512,26 +1542,50 @@ return r;
 
 function testarCarregamento(url) {
 return new Promise(resolve => {
+const inicio = performance.now();
 const v = document.createElement("video");
-v.preload = "metadata"; v.muted = true; v.playsinline = true;
-v.style.cssText = "position:fixed; width:1px; height:1px; opacity:0; pointer-events:none;";
+v.muted = true;
+v.playsinline = true;
+v.preload = "auto";
+v.style.cssText = "position:fixed; left:-9999px; top:0; width:2px; height:2px; opacity:0.01; pointer-events:none;";
 document.body.appendChild(v);
 let feito = false;
+let evento = "";
 const fim = (res) => {
-if (feito) return; feito = true;
+if (feito) return;
+feito = true;
 clearTimeout(timer);
-v.removeAttribute("src"); v.load(); v.remove();
+res.tempo = ((performance.now() - inicio) / 1000).toFixed(1).replace(".", ",");
+try { v.pause(); v.removeAttribute("src"); v.load(); } catch (e) {}
+v.remove();
+if (!res.ok) ultimoErroTeste = { codigo: res.codigo, evento: res.evento, msg: res.msg, url };
 resolve(res);
 };
-const timer = setTimeout(() => fim({ ok: false, codigo: null, msg: "Sem resposta em 12 segundos. O servidor não devolveu o vídeo: pode ser link restrito, arquivo bloqueado por excesso de acessos ou endereço inexistente.", acao: "Confira se o compartilhamento está público e se o endereço existe." }), 12000);
-v.addEventListener("loadedmetadata", () => {
-const d = isFinite(v.duration) ? Math.round(v.duration) : null;
-fim({ ok: true, duracao: d, largura: v.videoWidth, altura: v.videoHeight });
+const falhou = (evt, codigo) => fim({
+ok: false, codigo, evento: evt,
+msg: evt === "timeout"
+? "Sem resposta em 20 segundos. O servidor não devolveu o vídeo a tempo."
+: (ERROS_MEDIA[codigo] || ERROS_MEDIA[4]),
+acao: evt === "timeout" ? "Confira se o link está público e se o endereço existe." : (ACOES_MEDIA[codigo] || ACOES_MEDIA[4])
 });
-v.addEventListener("error", () => {
-const c = v.error ? v.error.code : 4;
-fim({ ok: false, codigo: c, msg: ERROS_MEDIA[c] || ERROS_MEDIA[4], acao: ACOES_MEDIA[c] || ACOES_MEDIA[4] });
+const sucesso = (evt) => {
+const dur = v.duration;
+const transmissao = !isFinite(dur) || isNaN(dur);
+fim({
+ok: true, evento: evt, transmissao,
+duracao: transmissao ? null : Math.round(dur),
+largura: v.videoWidth, altura: v.videoHeight
 });
+};
+const timer = setTimeout(() => falhou("timeout", null), 20000);
+["loadedmetadata", "loadeddata", "canplay", "playing"].forEach(ev =>
+v.addEventListener(ev, () => sucesso(ev)));
+["error", "stalled", "abort", "emptied"].forEach(ev =>
+v.addEventListener(ev, () => {
+if (ev === "error") falhou("error", v.error ? v.error.code : 4);
+else if (ev === "stalled") { /* aguarda timeout ou evento de sucesso */ }
+else falhou(ev, null);
+}));
 v.src = url;
 v.load();
 });
@@ -1548,20 +1602,28 @@ return { status: "aviso", msg: a.msg, acao: a.acao, url, codigo: null, convertiv
 const b = await testarCarregamento(url);
 if (b.ok) {
 const dim = b.largura && b.altura ? b.largura + "x" + b.altura : null;
-return { status: a.extensao && a.msg === "Extensão reconhecida." ? "ok" : "ok", msg: "Vídeo carregou" + (b.duracao != null ? ": " + fmtDuracao(b.duracao) : "") + (dim ? ", " + dim : "") + ".", acao: "Nenhuma ação necessária.", url, codigo: null, convertivel: null, duracao: b.duracao, dimensao: dim };
+const dur = b.transmissao ? "transmissão contínua sem duração fixa" : (b.duracao != null ? fmtDuracao(b.duracao) : null);
+return { status: "ok", msg: "Vídeo carregou" + (dur ? ": " + dur : "") + (dim ? ", " + dim : "") + ".", acao: "Nenhuma ação necessária.", url, codigo: null, convertivel: null, duracao: b.transmissao ? null : b.duracao, dimensao: dim, tempo: b.tempo, evento: b.evento };
 }
-return { status: "erro", msg: b.msg, acao: b.acao, url, codigo: b.codigo, convertivel: null, duracao: null, dimensao: null };
+return { status: "erro", msg: b.msg, acao: b.acao, url, codigo: b.codigo, evento: b.evento, convertivel: null, duracao: null, dimensao: null, tempo: b.tempo };
 }
 
 function renderResultadoDiag(res) {
 const cls = res.status === "ok" ? "diag-ok" : res.status === "aviso" ? "diag-warn" : "diag-err";
-const selo2 = res.status === "ok" ? "Funcionou" : res.status === "aviso" ? "Funcionou com ressalva" : "Não funciona";
-const cod = res.codigo ? `<div class="helper">Código do erro do navegador: ${res.codigo}</div>` : "";
+const selo2 = res.status === "ok" ? "🟢 Funcionou" : res.status === "aviso" ? "🟡 Funcionou com ressalva" : "🔴 Não funciona";
+const tempo = res.tempo ? `<div class="resultado-linha">Respondeu em ${res.tempo}s</div>` : "";
+const falha = res.status === "erro" ? `
+${res.codigo ? `<div class="helper">Código do MediaError: ${res.codigo}</div>` : ""}
+${res.evento ? `<div class="helper">Evento: ${escHtml(res.evento)}</div>` : ""}
+<div style="margin-top:6px;"><strong>Ação recomendada:</strong> ${escHtml(res.acao)}</div>` : "";
+const cod = res.status !== "erro" && res.codigo ? `<div class="helper">Código do erro do navegador: ${res.codigo}</div>` : "";
 return `<div class="diag-box ${cls}" role="status">
 <div style="font-weight:600; margin-bottom:4px;">${selo2}</div>
+${tempo}
 <div>${escHtml(res.msg)}</div>
 ${cod}
-<div style="margin-top:6px;"><strong>Ação:</strong> ${escHtml(res.acao)}</div>
+${falha}
+<div class="nowrap-row" style="margin-top:8px;"><button class="btn-ghost" type="button" data-abrir="${escHtml(res.url || "")}">Abrir este vídeo em nova aba</button><span class="helper" style="max-width:420px;">Se abrir e tocar na nova aba, mas falhar aqui, o problema é o ambiente deste navegador e não o arquivo.</span></div>
 <div class="helper" style="word-break:break-all; margin-top:6px;">${escHtml(res.url || "")}</div>
 ${res.convertivel ? `<div class="nowrap-row" style="margin-top:8px;"><button class="btn-ghost" type="button" data-conv="${escHtml(res.convertivel)}">Converter para link direto</button></div>` : ""}
 </div>`;
@@ -1581,6 +1643,8 @@ if (conv) conv.addEventListener("click", () => {
 root.querySelector("#vUrl").value = conv.dataset.conv;
 testarUrlNoPainel(conv.dataset.conv, root);
 });
+const abrir = painel.querySelector("[data-abrir]");
+if (abrir) abrir.addEventListener("click", () => window.open(abrir.dataset.abrir, "_blank"));
 btn.disabled = false; btn2.disabled = false;
 btn.textContent = "Testar link";
 }
@@ -1603,16 +1667,28 @@ const resultados = [];
 for (let i = 0; i < lista.length; i++) {
 rel.innerHTML = `<div class="helper" style="margin-bottom:10px;">Testando ${i + 1} de ${lista.length}…</div>`;
 const res = await testarVideoEmSegundoPlano(lista[i]);
-resultados.push({ nome: lista[i].nome, res });
+resultados.push({ nome: lista[i].nome, res, exemplo: /\(teste\)$/.test(lista[i].nome) });
 }
 const ok = resultados.filter(r => r.res.status === "ok").length;
 const av = resultados.filter(r => r.res.status === "aviso").length;
 const fa = resultados.filter(r => r.res.status === "erro").length;
+const exemplosOk = resultados.filter(r => r.exemplo && r.res.status === "ok").length;
+const usuarioFalhou = resultados.filter(r => !r.exemplo && r.res.status === "erro").length;
+let conclusao;
+if (resultados.length && fa === resultados.length) conclusao = `<div class="diag-msg err">Todos os vídeos falharam, inclusive os de exemplo. Isso indica bloqueio do ambiente ou do navegador, não problema nos seus arquivos. Abra o endereço publicado em uma aba normal do navegador ou rode o diagnóstico de ambiente.</div>`;
+else if (exemplosOk && usuarioFalhou) conclusao = `<div class="diag-msg warn">O app e o navegador estão funcionando. O problema está nos links ou nos arquivos cadastrados.</div>`;
+else if (resultados.length && ok === resultados.length) conclusao = `<div class="diag-msg warn" style="color:#6ee7b7; background:rgba(52,211,153,.10); border-color:rgba(52,211,153,.35);">Programação verificada. Os vídeos estão prontos para as TVs.</div>`;
 rel.innerHTML = `<div class="card-dark" style="margin-bottom:12px;">
 <div class="health-bar" style="margin-bottom:10px;"><strong>${ok} funcionando, ${av} com ressalva, ${fa} falhou</strong></div>
+${conclusao || ""}
 ${resultados.map(r => `<div class="row-line" style="margin-bottom:6px;"><span class="nm">${escHtml(r.nome)}</span>${selo(r.res.status === "ok" ? "ok" : r.res.status === "aviso" ? "aviso" : "erro")}<span class="helper" style="max-width:340px;">${escHtml(r.res.status === "ok" ? "" : r.res.msg)}</span></div>`).join("")}
 </div>`;
 renderPainel();
+}
+
+function atualizarBotaoSom(btn, mudo) {
+btn.textContent = mudo ? "🔈 Sem som" : "🔊 Com som";
+btn.setAttribute("aria-label", mudo ? "Ativar som" : "Desativar som");
 }
 
 function abrirPreview(v) {
@@ -1620,6 +1696,10 @@ const dlg = document.getElementById("dlgPreview");
 const vid = document.getElementById("previewVideo");
 document.getElementById("dlgPreviewTitle").textContent = v.nome;
 vid.src = v.src;
+vid.muted = estado.config.modoSilencioso !== false;
+const btnSom = document.getElementById("btnSomPreview");
+atualizarBotaoSom(btnSom, vid.muted);
+btnSom.onclick = () => { vid.muted = !vid.muted; atualizarBotaoSom(btnSom, vid.muted); };
 vid.onloadedmetadata = () => {
 if (isFinite(vid.duration)) {
 v.duracaoEstimada = Math.round(vid.duration);
@@ -1753,7 +1833,7 @@ root.innerHTML = `
 <section class="card-dark" style="margin-bottom:18px;">
 <div class="nowrap-row" style="justify-content:space-between;">
 <div>
-<h2 class="section-title">Telas do shopping</h2>
+<h2 class="section-title">Telas da Casas da Água</h2>
 <div class="muted-dark" style="font-size:13px;">Cada TV tem um link próprio. Abra o link na TV em modo tela cheia.</div>
 </div>
 <div class="nowrap-row">
@@ -1767,12 +1847,12 @@ root.innerHTML = `
 <div class="two-col">
 <div>
 <label class="lbl" for="tNome">Nome</label>
-<input class="inp" id="tNome" placeholder="Ex.: TV Corredor Norte">
+<input class="inp" id="tNome" placeholder="Ex.: TV Recepção">
 <div class="helper">Nome interno para identificar o ponto.</div>
 </div>
 <div>
 <label class="lbl" for="tLocal">Local</label>
-<input class="inp" id="tLocal" placeholder="Ex.: Piso L1">
+<input class="inp" id="tLocal" placeholder="Ex.: Salão de vendas">
 <div class="helper">Onde a TV está instalada.</div>
 </div>
 <div>
@@ -1871,7 +1951,7 @@ const agora = new Date();
 const emExecucao = resumoAgora(agora);
 root.innerHTML = `
 <section class="card-dark" style="margin-bottom:18px; background:linear-gradient(135deg, rgba(212,162,76,.12), #161922);">
-<div class="muted-dark" style="font-size:12px; text-transform:uppercase; letter-spacing:.08em;">Agora no shopping</div>
+<div class="muted-dark" style="font-size:12px; text-transform:uppercase; letter-spacing:.08em;">Agora na Casas da Água</div>
 <div style="font-size:18px; margin-top:6px;" id="resumoAgora">${escHtml(emExecucao)}</div>
 <div class="helper" style="margin-top:8px;">Atualizado com base no horário atual deste aparelho (${DIAS_LONGO[agora.getDay()]}, ${String(agora.getHours()).padStart(2,"0")}:${String(agora.getMinutes()).padStart(2,"0")}).</div>
 </section>
@@ -1971,6 +2051,50 @@ return partes.join(" · ");
 
 /* ---------- ABA PUBLICAR ---------- */
 let cacheJsonCopia = "";
+const URL_MP4_REFERENCIA = "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+
+function linhaDiag(rotulo, valor) {
+return `<div class="diag-row"><span>${escHtml(rotulo)}</span><span>${escHtml(valor)}</span></div>`;
+}
+
+function nomeNavegador(ua) {
+const regras = [
+[/Edg\/([\d.]+)/, "Microsoft Edge"], [/OPR\/([\d.]+)/, "Opera"], [/Chrome\/([\d.]+)/, "Chrome"],
+[/Firefox\/([\d.]+)/, "Firefox"], [/Version\/([\d.]+).*Safari/, "Safari"]
+];
+for (const [re, nome] of regras) {
+const m = ua.match(re);
+if (m) return nome + " " + m[1].split(".")[0];
+}
+return "Navegador desconhecido";
+}
+
+function renderDiagnosticoAmbiente(root) {
+const lista = root.querySelector("#diagLista");
+const avisos = root.querySelector("#diagAvisos");
+const dentroIframe = window.self !== window.top;
+const proto = window.location.protocol;
+const host = window.location.hostname || "arquivo local";
+const ua = navigator.userAgent || "";
+const vid = document.createElement("video");
+const h264 = vid.canPlayType('video/mp4; codecs="avc1.42E01E, mp4a.40.2"');
+const hls = vid.canPlayType("application/vnd.apple.mpegurl");
+const trad = { "": "Não suportado", "maybe": "Talvez", "probably": "Suportado" };
+const conn = navigator.connection && navigator.connection.effectiveType ? navigator.connection.effectiveType : "não disponível";
+lista.innerHTML = [
+linhaDiag("Dentro de quadro incorporado", dentroIframe ? "Sim" : "Não"),
+linhaDiag("Protocolo", proto),
+linhaDiag("Domínio", host),
+linhaDiag("Navegador", nomeNavegador(ua)),
+linhaDiag("MP4 H.264", trad[h264] || "Talvez"),
+linhaDiag("HLS (.m3u8)", trad[hls] || "Não suportado"),
+linhaDiag("Conexão", (navigator.onLine ? "Online" : "Offline") + " · " + conn)
+].join("");
+let html = "";
+if (dentroIframe) html += `<div class="diag-msg warn">Esta página está rodando dentro de um quadro incorporado. Quadros incorporados frequentemente bloqueiam vídeos externos. Abra o endereço publicado diretamente em uma aba do navegador para testar de verdade.</div>`;
+if (proto === "file:") html += `<div class="diag-msg err">A página está sendo aberta como arquivo local. Nesse modo o navegador bloqueia o carregamento de vídeos externos. Use o endereço publicado.</div>`;
+avisos.innerHTML = html;
+}
 
 function renderPublicar(root) {
 const ultimo = estado.ultimoExport ? new Date(estado.ultimoExport).toLocaleString("pt-BR") : "Nunca exportado";
@@ -1989,11 +2113,26 @@ root.innerHTML = `
 <div class="helper" style="margin-top:10px;">Teste os links no endereço publicado, em uma aba anônima do navegador do computador. Pré-visualizações dentro de painéis podem bloquear vídeos externos, e o resultado ali não representa o que a TV vai fazer.</div>
 </section>
 
+<section class="card-dark" style="margin-bottom:18px;" id="cardDiag">
+<h2 class="section-title">Diagnóstico do ambiente</h2>
+<div class="helper">Verificações feitas automaticamente neste navegador.</div>
+<div class="diag-list" id="diagLista"></div>
+<div id="diagAvisos"></div>
+<div class="nowrap-row" style="margin-top:12px;"><button class="btn-gold" type="button" id="btnTestarMp4Ref">Testar o MP4 de referência do Google</button></div>
+<div id="diagResultadoRef" style="margin-top:8px;"></div>
+<div class="helper" style="margin-top:8px;">Este arquivo é público, sem restrição e sem cota. Se ele não carregar aqui, o bloqueio é do ambiente, não do seu vídeo.</div>
+</section>
+
+<section class="card-dark" style="margin-bottom:18px;">
+<label class="switch-row"><input type="checkbox" id="chkModoSilencioso" ${estado.config.modoSilencioso !== false ? "checked" : ""}> Iniciar os vídeos sem som (recomendado para TVs)</label>
+<div class="helper" style="margin-top:6px;">Navegadores só reproduzem vídeo automaticamente quando ele está sem som. Com o modo silencioso ligado, a TV inicia a programação sozinha.</div>
+</section>
+
 <section class="card-dark" style="margin-bottom:18px;">
 <div class="nowrap-row" style="justify-content:space-between;">
 <div>
-<h2 class="section-title">Publicar nas TVs</h2>
-<div class="muted-dark" style="font-size:13px;">Envie a programação para todas as TVs sem depender deste aparelho.</div>
+<h2 class="section-title">Publicar nas TVs da Casas da Água</h2>
+<div class="muted-dark" style="font-size:13px;">Envie a programação para todas as TVs da Casas da Água sem depender deste aparelho.</div>
 </div>
 <span class="badge badge-local">Último export: ${escHtml(ultimo)}</span>
 </div>
@@ -2002,7 +2141,7 @@ root.innerHTML = `
 <section class="card-dark" style="margin-bottom:18px;">
 <h3 style="margin:0 0 12px; font-size:16px;">Fluxo remoto em 3 passos</h3>
 <div class="two-col" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
-<div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">1</span><div class="nm"><strong>Baixe</strong> o arquivo de configuração (.json) com o botão abaixo.</div></div>
+<div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">1</span><div class="nm"><strong>Baixe</strong> o arquivo de configuração (.json) sugerido como <code>config-casas-da-agua.json</code> (para publicar na TV ou servidor, salve como <code>config.json</code>).</div></div>
 <div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">2</span><div class="nm"><strong>Hospede</strong> o JSON em um endereço público: Google Drive com link direto, GitHub Gist raw ou qualquer hospedagem.</div></div>
 <div class="row-line" style="align-items:flex-start;"><span class="badge badge-link">3</span><div class="nm"><strong>Abra</strong> na TV o link do player com <code>?config=ENDERECO_DO_JSON</code>.</div></div>
 </div>
@@ -2012,7 +2151,7 @@ root.innerHTML = `
 <section class="two-col" style="margin-bottom:18px;">
 <div class="card-dark">
 <h3 style="margin:0 0 4px; font-size:16px;">Exportar</h3>
-<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">Gere o arquivo ou copie o texto para colar em um Gist.</div>
+<div class="muted-dark" style="font-size:13px; margin-bottom:12px;">Gere o arquivo config-casas-da-agua.json ou copie o texto para colar em um Gist (na publicação final, use o nome config.json).</div>
 <div class="nowrap-row">
 <button class="btn-gold" id="btnExportar">Exportar configuração (.json)</button>
 <button class="btn-ghost" id="btnCopiarJson">Copiar configuração como texto</button>
@@ -2057,16 +2196,33 @@ setAba("videos");
 setTimeout(() => testarTodosVideos(painel), 50);
 });
 
+renderDiagnosticoAmbiente(root);
+
+root.querySelector("#chkModoSilencioso").addEventListener("change", e => {
+estado.config.modoSilencioso = e.target.checked;
+salvarEstado(estado);
+toast("Preferência de som salva.", { type: "success" });
+});
+
+root.querySelector("#btnTestarMp4Ref").addEventListener("click", async () => {
+const alvo = root.querySelector("#diagResultadoRef");
+alvo.innerHTML = `<div class="helper">⏳ Testando…</div>`;
+const res = await diagnosticarUrl(URL_MP4_REFERENCIA);
+alvo.innerHTML = renderResultadoDiag(res);
+const abrir = alvo.querySelector("[data-abrir]");
+if (abrir) abrir.addEventListener("click", () => window.open(abrir.dataset.abrir, "_blank"));
+});
+
 root.querySelector("#btnExportar").addEventListener("click", () => {
 const blob = new Blob([JSON.stringify(exportarObjeto(), null, 2)], { type: "application/json" });
 const a = document.createElement("a");
 a.href = URL.createObjectURL(blob);
-a.download = "configuracao-telas.json";
+a.download = "config-casas-da-agua.json";
 a.click();
 setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 estado.ultimoExport = new Date().toISOString();
 salvarEstado(estado);
-toast("Arquivo de configuração exportado.", { type: "success" });
+toast("Arquivo exportado como config-casas-da-agua.json (renomeie para config.json ao publicar).", { type: "success" });
 });
 
 root.querySelector("#btnCopiarJson").addEventListener("click", () => {
@@ -2190,7 +2346,7 @@ const tela = dadosPlayer.telas.find(t => t.id === telaId);
 if (!tela) {
 telaRoot.innerHTML = `
 <div style="height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; gap:12px;">
-<div style="font-size:14px; letter-spacing:.2em; color:#d4a24c;">CENTRAL DE TELAS</div>
+<div style="font-size:14px; letter-spacing:.2em; color:#d4a24c;">CENTRAL DE TELAS — CASAS DA ÁGUA</div>
 <div style="font-size:clamp(24px,4vw,44px); font-weight:700;">Tela não encontrada</div>
 <div style="color:#9aa1b2; max-width:560px;">Este identificador não está cadastrado. Cadastre a tela no painel de controle e copie o link gerado.</div>
 <a href="#/controle" style="color:#e8b96a; margin-top:12px;">Ir para o painel de controle</a>
@@ -2201,15 +2357,16 @@ return;
 telaRoot.innerHTML = `
 <video id="pv" playsinline preload="auto" style="position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; display:none;"></video>
 <div id="pErro" class="erro-player" style="display:none;"></div>
+<button id="pBtnSom" class="som-btn" type="button" aria-label="Ativar som">🔈</button>
 <div id="pEspera" style="position:absolute; inset:0; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; background:radial-gradient(circle at 50% 40%, #1b1710, #000 70%);">
 <div id="pRelogio" style="font-size:clamp(64px,16vw,200px); font-weight:300; font-variant-numeric:tabular-nums; letter-spacing:.02em;">--:--</div>
 <div id="pNomeEspera" style="font-size:clamp(18px,3vw,34px); color:#e8b96a; margin-top:8px;"></div>
-<div style="margin-top:28px; font-size:14px; letter-spacing:.3em; color:#8b8373;">CENTRAL DE TELAS</div>
+<div style="margin-top:28px; font-size:14px; letter-spacing:.3em; color:#8b8373;">CASAS DA ÁGUA</div>
 <div id="pMsgEspera" style="color:#9aa1b2; font-size:16px; margin-top:6px;"></div>
 </div>
 <div id="pPreto" style="position:absolute; inset:0; background:#000; display:none;"></div>
 <div id="pOverlay" style="position:absolute; inset:0; background:linear-gradient(160deg,#120f0a,#000); display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:24px; z-index:5;">
-<div style="font-size:13px; letter-spacing:.3em; color:#d4a24c;">SHOPPING</div>
+<div style="font-size:13px; letter-spacing:.3em; color:#d4a24c;">CASAS DA ÁGUA</div>
 <div id="pOvNome" style="font-size:clamp(28px,5vw,58px); font-weight:700; margin:10px 0;"></div>
 <div id="pOvLocal" style="color:#9aa1b2; font-size:18px;"></div>
 <button id="pBtnIniciar" style="margin-top:36px; background:#d4a24c; color:#14110a; border:none; border-radius:14px; padding:22px 48px; font-size:clamp(20px,3vw,30px); font-weight:700; cursor:pointer;">Iniciar exibição</button>
@@ -2227,6 +2384,8 @@ const atual = playerEstado.videos[playerEstado.indice % (playerEstado.videos.len
 falhaVideo("erro-media", atual);
 });
 document.getElementById("pBtnIniciar").addEventListener("click", iniciarExibicao);
+document.getElementById("pBtnSom").addEventListener("click", e => { e.stopPropagation(); alternarSomPlayer(); });
+atualizarBotaoSomPlayer();
 
 document.getElementById("pNomeTela").textContent = tela.nome;
 document.getElementById("pOvNome").textContent = tela.nome;
@@ -2337,8 +2496,24 @@ falhaVideo("youtube", v, "Link do YouTube não toca direto no player.", "Use um 
 return;
 }
 pv.src = src;
-pv.muted = false;
+pv.muted = estado.config.modoSilencioso !== false;
+atualizarBotaoSomPlayer();
 pv.play().then(() => { playerEstado.falhas = 0; }).catch(() => { /* aguarda toque */ });
+}
+
+function atualizarBotaoSomPlayer() {
+const b = document.getElementById("pBtnSom");
+const pv = document.getElementById("pv");
+if (!b || !pv) return;
+b.textContent = pv.muted ? "🔈" : "🔊";
+b.setAttribute("aria-label", pv.muted ? "Ativar som" : "Desativar som");
+}
+
+function alternarSomPlayer() {
+const pv = document.getElementById("pv");
+if (!pv) return;
+pv.muted = !pv.muted;
+atualizarBotaoSomPlayer();
 }
 
 function proximoVideo() {
@@ -2350,7 +2525,7 @@ tocarAtual();
 function falhaVideo(motivo, video, msgErro, acaoErro) {
 clearTimeout(playerTimers.falha);
 playerEstado.falhas++;
-try { console.warn("[Central de Telas] falha de reprodução registrada", motivo || ""); } catch (e) {}
+try { console.warn("[Central de Telas — Casas da Água] falha de reprodução registrada", motivo || ""); } catch (e) {}
 const pv = document.getElementById("pv");
 const cod = pv && pv.error ? pv.error.code : null;
 const msg = msgErro || (cod ? ERROS_MEDIA[cod] : "Falha desconhecida ao reproduzir.");
